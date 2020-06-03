@@ -50,7 +50,7 @@ def zero_padding(list_to_pad, max_length, pad_dimension):
     return list_to_pad
 
 ## 1. load dataset
-df = pd.read_csv('../data/ag_news/train.csv')
+df = pd.read_csv('../data/ag_news/train.csv', nrows=1000)
 
 ## 2. apply tokenization and embedding
 df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
@@ -102,10 +102,10 @@ print(f'\ndevice: {device}')
 net.to(device)
 
 ## 6. create training pipeline
-train_x = df['embedding'].tolist()[:1000]
+train_x = df['embedding'].tolist()
 tensor_x = torch.tensor(train_x)
 
-train_y = df['Class Index'].tolist()[:1000]
+train_y = df['Class Index'].tolist()
 tensor_y = torch.tensor(train_y, dtype=torch.long)
 set(train_y)
 
