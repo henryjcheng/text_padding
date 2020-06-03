@@ -57,11 +57,11 @@ df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
 
 w2v = Word2Vec.load('../model/w2v/ag_news.model')
 df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
-temp = df['embedding'][0]
 
 ## 3. zero pad to max length
 df['text_length'] = df['text_token'].apply(lambda x: len(x))
-max_length = max(df['text_length'])
+#max_length = max(df['text_length'])
+max_length = 245
 
 print(f'max length: {max_length}')
 
