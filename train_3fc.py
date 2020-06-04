@@ -7,14 +7,15 @@ Program flow:
     1. load data as pd.DataFrame
     2. apply tokenization and embedding
     3. zero pad to max length
-    4. convert to pytorch tensor
-    5. create nn architecture
-    6. create training pipeline
-    7. train and save model
-    8. evaluate model performance
+    4. create nn architecture
+    5. create training pipeline
+    6. train and save model
 
 We will start with simple 3 FC layers and focus on getting pipeline running before expanding 
 our architecture.
+
+Future dev:
+    1. refactor preprocessing code to one function
 """
 import numpy as np
 import pandas as pd
@@ -67,13 +68,7 @@ print(f'max length: {max_length}')
 emb_dim = 50
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim))
 
-## 4. convert to pytorch tensor
-list_to_append = []
-
-for array in df['embedding']:
-    list_to_append.append(torch.tensor(array))
-
-## 5. create nn architecture
+## 4. create nn architecture
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -100,7 +95,7 @@ print(f'\ndevice: {device}')
 
 net.to(device)
 
-## 6. create training pipeline
+## 5. create training pipeline
 train_x = df['embedding'].tolist()
 tensor_x = torch.tensor(train_x)
 
@@ -108,14 +103,14 @@ train_y = df['Class Index'].tolist()
 tensor_y = torch.tensor(train_y, dtype=torch.long)
 set(train_y)
 
-my_dataset = TensorDataset(tensor_x, tensor_y) # create your datset
-my_dataloader = DataLoader(my_dataset, batch_size=32, shuffle=True) # create your dataloader
+data_train = TensorDataset(tensor_x, tensor_y) # create your datset
+loader_train = DataLoader(data_train, batch_size=32, shuffle=True) # create your dataloader
 
-## 7. train and save model
+## 6. train and save model
 for epoch in range(5):
     running_loss = 0.0
     print(f'\nepoch {epoch + 1}')
-    for i, data in enumerate(my_dataloader):
+    for i, data in enumerate(loader_train):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
         
