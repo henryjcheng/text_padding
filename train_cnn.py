@@ -60,8 +60,7 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
 ## 3. zero pad to max length
 df['text_length'] = df['text_token'].apply(lambda x: len(x))
-#max_length = max(df['text_length'])
-max_length = 245
+max_length = max(df['text_length'])
 
 print(f'max length: {max_length}')
 
