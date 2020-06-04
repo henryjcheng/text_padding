@@ -54,7 +54,8 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
 ## 3. zero pad to max length
 df['text_length'] = df['text_token'].apply(lambda x: len(x))
-max_length = max(df['text_length'])
+#max_length = max(df['text_length'])
+max_length = 245    # specify max length from train set
 
 print(f'max length: {max_length}')
 
@@ -88,7 +89,7 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-PATH = '../model/cnn/fc3.pth'
+PATH = '../model/cnn/3fc.pth'
 net = Net()
 net.load_state_dict(torch.load(PATH))
 
@@ -99,26 +100,47 @@ with torch.no_grad():
         text, labels = data
         outputs = net(text)
         _, predicted = torch.max(outputs.data, 1)
+
+        # not sure why prediction uses 0 instead of 4, will correct here
+        list_correct = []
+        for item in predicted:
+            if item == 0:
+                list_correct.append(4)
+            else:
+                list_correct.append(item)
+        predicted = torch.tensor(list_correct)
+
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-print(f'Accuracy: {100 * correct/total}%')
+print(f'\nAccuracy: {100 * correct/total}%')
 
-class_correct = list(0. for i in range(10))
-class_total = list(0. for i in range(10))
+class_correct = list(0. for i in range(5))
+class_total = list(0. for i in range(5))
 with torch.no_grad():
-    for data in loader_test:
-        images, labels = data
-        outputs = net(images)
+    for batch, data in enumerate(loader_test):
+        text, labels = data
+        outputs = net(text)
         _, predicted = torch.max(outputs, 1)
+
+        # not sure why prediction uses 0 instead of 4, will correct here
+        list_correct = []
+        for item in predicted:
+            if item == 0:
+                list_correct.append(4)
+            else:
+                list_correct.append(item)
+        predicted = torch.tensor(list_correct)
+
         c = (predicted == labels).squeeze()
-        for i in range(4):
+
+        for i in range(len(labels)):
             label = labels[i]
             class_correct[label] += c[i].item()
             class_total[label] += 1
 
-classes = (1, 2, 3, 4)
+classes = ('0', '1', '2', '3', '4')
 
-for i in range(4):
-    print('Accuracy of %5s : %2d %%' % (
-        classes[i], 100 * class_correct[i] / class_total[i]))
+for i in range(5):
+    print('Accuracy of class %5s : %2d %%' % (
+        classes[i], 100 * class_correct[i] / (class_total[i] + .000001)))
