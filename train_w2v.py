@@ -59,11 +59,13 @@ def train_w2v(df, emb_dim, min_count):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv(sys.argv[1])
+    df_train = pd.read_csv('../data/ag_news/train.csv')
+    df_test = pd.read_csv('../data/ag_news/test.csv')
+    df = pd.concat([df_train, df_test])
     df_text = df[['Description']].reset_index(drop=True).rename(columns={'Description':'text'})
 
     w2v = train_w2v(df_text, 50, 1)
 
-    dir_save = sys.argv[2]
-    model_name = sys.argv[3] + '.model'
+    dir_save = '../model/w2v'
+    model_name = 'ag_news' + '.model'
     w2v.save(os.path.join(dir_save, model_name))
