@@ -52,6 +52,8 @@ def zero_padding(list_to_pad, max_length, pad_dimension):
 
 ## 1. load dataset
 df = pd.read_csv('../data/ag_news/train.csv')
+# convert class 4 to class 0
+df['Class Index'] = df['Class Index'].replace(4, 0)
 
 ## 2. apply tokenization and embedding
 df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
