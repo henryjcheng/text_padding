@@ -63,7 +63,6 @@ def zero_padding_random(list_to_pad, max_length, pad_dimension):
     vector_pad = np.asarray([0] * pad_dimension, dtype=np.float32)
     vector_pad = [vector_pad]    # convert to list of np.ndarray so we can append together 
 
-    random.seed(1)
     position_random = random.sample(range(0, max_length-1), num_pad)
     index_list_to_pad = 0
     list_temp = np.empty((0, pad_dimension), dtype=np.float32)
@@ -71,11 +70,12 @@ def zero_padding_random(list_to_pad, max_length, pad_dimension):
         if position in position_random:
             vector_to_append = vector_pad
         else:
-            vector_to_append = list_to_pad[index_list_to_pad]
+            vector_to_append = [list_to_pad[index_list_to_pad]]
             index_list_to_pad += 1
+
         list_temp = np.append(list_temp, vector_to_append, axis=0)
 
-    return list_to_pad
+    return list_temp
 
 def zero_padding_bothside(list_to_pad, max_length, pad_dimension):
     """
