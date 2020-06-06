@@ -50,6 +50,41 @@ def zero_padding(list_to_pad, max_length, pad_dimension):
     
     return list_to_pad
 
+def zero_padding_bothside(list_to_pad, max_length, pad_dimension):
+    """
+    This function takes a list and add list of zeros until max_length is reached.
+    The number of zeroes in added list is determined by pad_dimension, which is the 
+    same as the dimension of the word2vec model.
+
+    Padding is done to both side of the text. When required number of padding vector is 
+    odd, the extra vector is add to the right (bottom) side.  
+
+    This function is intended to handle one list only so it can be passed 
+    into a dataframe as a lambda function.
+    """
+    # find number of padding vector needed
+    num_pad = max_length - len(list_to_pad)
+
+    # vector_pad = np.zeros(pad_dimension)
+    vector_pad = np.asarray([0] * pad_dimension, dtype=np.float32)
+    vector_pad = [vector_pad]    # convert to list of np.ndarray so we can append together 
+
+    num_each_side = int(num_pad/2)
+    iteration = 0
+    list_each_side = np.empty((0, pad_dimension), dtype=np.float32)
+    while iteration < num_each_side:
+        list_each_side = np.append(list_each_side, vector_pad, axis=0)
+        iteration += 1
+
+    list_to_pad = np.append(list_each_side, list_to_pad, axis=0)
+    list_to_pad = np.append(list_to_pad, list_each_side, axis=0)
+
+    # add one more pad to the right side when odd number of padding vector
+    if num_pad%2 == 1:
+        list_to_pad = np.append(list_to_pad, vector_pad, axis=0)
+    
+    return list_to_pad
+
 ## 1. load dataset
 df = pd.read_csv('../data/ag_news/train.csv')
 # convert class 4 to class 0
