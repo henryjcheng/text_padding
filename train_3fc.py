@@ -201,7 +201,7 @@ for epoch in range(5):
             print(f'\tbatch {i}    loss: {running_loss/200}')
         running_loss = 0.0
 
-PATH = '../model/cnn/3fc_pad_bothside.pth'
+PATH = '../model/cnn/3fc_pad_random.pth'
 torch.save(net.state_dict(), PATH)
 
 print('Process complete.')
