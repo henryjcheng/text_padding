@@ -103,38 +103,18 @@ with torch.no_grad():
         text, labels = data
         outputs = net(text)
         _, predicted = torch.max(outputs.data, 1)
-
-        # not sure why prediction uses 0 instead of 4, will correct here
-        list_correct = []
-        for item in predicted:
-            if item == 0:
-                list_correct.append(4)
-            else:
-                list_correct.append(item)
-        predicted = torch.tensor(list_correct)
-
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
 print(f'\nAccuracy: {100 * correct/total}%')
 
-class_correct = list(0. for i in range(5))
-class_total = list(0. for i in range(5))
+class_correct = list(0. for i in range(4))
+class_total = list(0. for i in range(4))
 with torch.no_grad():
     for batch, data in enumerate(loader_test):
         text, labels = data
         outputs = net(text)
         _, predicted = torch.max(outputs, 1)
-
-        # not sure why prediction uses 0 instead of 4, will correct here
-        list_correct = []
-        for item in predicted:
-            if item == 0:
-                list_correct.append(4)
-            else:
-                list_correct.append(item)
-        predicted = torch.tensor(list_correct)
-
         c = (predicted == labels).squeeze()
 
         for i in range(len(labels)):
@@ -142,8 +122,8 @@ with torch.no_grad():
             class_correct[label] += c[i].item()
             class_total[label] += 1
 
-classes = ('0', '1', '2', '3', '4')
+classes = ('0', '1', '2', '3')
 
-for i in range(5):
+for i in range(4):
     print('Accuracy of class %5s : %2d %%' % (
         classes[i], 100 * class_correct[i] / (class_total[i] + .000001)))
