@@ -6,8 +6,7 @@ This module contains codes to test/evaluate CNN multi-class classification model
 Program flow:
 
 Future dev:
-    1. combine this into train_3fc
-    .py
+    1. combine this into train_3fc.py
 """
 import random
 import numpy as np
@@ -132,7 +131,7 @@ max_length = 245    # specify max length from train set
 print(f'max length: {max_length}')
 
 emb_dim = 50
-df['embedding'] = df['embedding'].apply(lambda x: zero_padding_bothside(x, max_length, emb_dim))
+df['embedding'] = df['embedding'].apply(lambda x: zero_padding_random(x, max_length, emb_dim))
 
 test_x = df['embedding'].tolist()
 tensor_x = torch.tensor(test_x)
@@ -161,7 +160,7 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-PATH = '../model/cnn/3fc_pad_bothside.pth'
+PATH = '../model/cnn/3fc_pad_random.pth'
 net = Net()
 net.load_state_dict(torch.load(PATH))
 
