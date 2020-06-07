@@ -138,7 +138,7 @@ max_length = max(df['text_length'])
 print(f'max length: {max_length}')
 
 emb_dim = 50
-df['embedding'] = df['embedding'].apply(lambda x: zero_padding_bothside(x, max_length, emb_dim))
+df['embedding'] = df['embedding'].apply(lambda x: zero_padding_random(x, max_length, emb_dim))
 
 ## 4. create nn architecture
 class Net(nn.Module):
@@ -207,7 +207,7 @@ for epoch in range(5):
             print(f'\tbatch {i}    loss: {running_loss/200}')
         running_loss = 0.0
 
-PATH = '../model/cnn/cnn_pad_bothside.pth'
+PATH = '../model/cnn/cnn_pad_random.pth'
 torch.save(net.state_dict(), PATH)
 
 print('Process complete.')
