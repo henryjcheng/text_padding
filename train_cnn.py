@@ -138,7 +138,7 @@ max_length = max(df['text_length'])
 print(f'max length: {max_length}')
 
 emb_dim = 50
-df['embedding'] = df['embedding'].apply(lambda x: zero_padding_random(x, max_length, emb_dim))
+df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim))
 
 ## 4. create nn architecture
 class Net(nn.Module):
@@ -184,7 +184,7 @@ data_train = TensorDataset(tensor_x, tensor_y) # create datset
 loader_train = DataLoader(data_train, batch_size=32, shuffle=True) # create dataloader
 
 ## 6. train and save model
-for epoch in range(5):
+for epoch in range(20):
     running_loss = 0.0
     print(f'\nepoch {epoch + 1}')
     for i, data in enumerate(loader_train):
@@ -207,7 +207,7 @@ for epoch in range(5):
             print(f'\tbatch {i}    loss: {running_loss/200}')
         running_loss = 0.0
 
-PATH = '../model/cnn/cnn_pad_random.pth'
+PATH = '../model/cnn/cnn_pad_bottom.pth'
 torch.save(net.state_dict(), PATH)
 
 print('Process complete.')
