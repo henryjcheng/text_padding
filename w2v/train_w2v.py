@@ -17,6 +17,7 @@ For conveniency, routinely used paths are identified here:
 """
 import os
 import sys
+import time
 import pandas as pd
 import multiprocessing
 import configparser
@@ -36,6 +37,7 @@ def train_w2v(df, emb_dim, min_count):
     min_count: minimum frequency count of word in the word2vec model
     """
     print('Start training word2vec...')
+    time0 = time.time()
     
     # tokenize
     print('\tTokenization...')
@@ -53,7 +55,8 @@ def train_w2v(df, emb_dim, min_count):
                    iter=10,
                    workers=multiprocessing.cpu_count())
     
-    print('Training complete.')
+    time_diff = round(time.time() - time0, 2)
+    print(f'Training complete.    Time elapsed: {time_diff}')
 
     return w2v
 
@@ -84,4 +87,3 @@ if __name__ == "__main__":
 
     # save trained model
     w2v.save(os.path.join(model_save_path, model_name))
-    
