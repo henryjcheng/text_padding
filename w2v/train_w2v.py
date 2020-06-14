@@ -19,6 +19,7 @@ import os
 import sys
 import pandas as pd
 import multiprocessing
+import configparser
 from gensim.models import Word2Vec
 from nltk.tokenize import word_tokenize
 ## first time uinsg nltk, uncomment the following 2 lines
@@ -59,6 +60,17 @@ def train_w2v(df, emb_dim, min_count):
 
 
 if __name__ == "__main__":
+    config = configparser.ConfigParser()
+    config.read('w2v.cfg')
+
+    # setting up parameters
+    data_path = config['PATH']['data_path']
+    model_save_path = config['PATH']['model_save_path']
+
+    model_name = config['MODEL']['model_name']
+    emb_dim = config['MODEL']['embedding_dimension']
+    min_freq = config['MODEL']['min_frequency']
+
     df_train = pd.read_csv('../data/ag_news/train.csv')
     df_test = pd.read_csv('../data/ag_news/test.csv')
     df = pd.concat([df_train, df_test])
