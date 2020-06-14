@@ -67,15 +67,21 @@ if __name__ == "__main__":
     data_path = config['PATH']['data_path']
     model_save_path = config['PATH']['model_save_path']
 
+    dataset = config['MODEL']['dataset']
     model_name = config['MODEL']['model_name']
-    emb_dim = config['MODEL']['embedding_dimension']
-    min_freq = config['MODEL']['min_frequency']
+    emb_dim = int(config['MODEL']['embedding_dimension'])
+    min_freq = int(config['MODEL']['min_frequency'])
 
-    # train model
+    # preprocessing
     df = pd.read_csv(data_path)
-    df_text = df[['Description']].reset_index(drop=True).rename(columns={'Description':'text'})
-
+    if dataset == 'ag_news':
+        df_text = df[['Description']].reset_index(drop=True).rename(columns={'Description':'text'})
+    else:
+        print(f'Dataset: {dataset} not recognized.')
+    
+    # train model
     w2v = train_w2v(df_text, emb_dim, min_freq)
 
     # save trained model
     w2v.save(os.path.join(model_save_path, model_name))
+    
