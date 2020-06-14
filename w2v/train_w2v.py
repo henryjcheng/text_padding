@@ -71,13 +71,11 @@ if __name__ == "__main__":
     emb_dim = config['MODEL']['embedding_dimension']
     min_freq = config['MODEL']['min_frequency']
 
-    df_train = pd.read_csv('../data/ag_news/train.csv')
-    df_test = pd.read_csv('../data/ag_news/test.csv')
-    df = pd.concat([df_train, df_test])
+    # train model
+    df = pd.read_csv(data_path)
     df_text = df[['Description']].reset_index(drop=True).rename(columns={'Description':'text'})
 
-    w2v = train_w2v(df_text, 50, 1)
+    w2v = train_w2v(df_text, emb_dim, min_freq)
 
-    dir_save = '../model/w2v'
-    model_name = 'ag_news' + '.model'
-    w2v.save(os.path.join(dir_save, model_name))
+    # save trained model
+    w2v.save(os.path.join(model_save_path, model_name))
