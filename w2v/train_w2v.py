@@ -17,8 +17,10 @@ For conveniency, routinely used paths are identified here:
 """
 import os
 import sys
+import time
 import pandas as pd
 import multiprocessing
+import configparser
 from gensim.models import Word2Vec
 from nltk.tokenize import word_tokenize
 ## first time uinsg nltk, uncomment the following 2 lines
@@ -35,6 +37,7 @@ def train_w2v(df, emb_dim, min_count):
     min_count: minimum frequency count of word in the word2vec model
     """
     print('Start training word2vec...')
+    time0 = time.time()
     
     # tokenize
     print('\tTokenization...')
@@ -52,20 +55,35 @@ def train_w2v(df, emb_dim, min_count):
                    iter=10,
                    workers=multiprocessing.cpu_count())
     
-    print('Training complete.')
+    time_diff = round(time.time() - time0, 2)
+    print(f'Training complete.    Time elapsed: {time_diff}')
 
     return w2v
 
 
 
 if __name__ == "__main__":
-    df_train = pd.read_csv('../data/ag_news/train.csv')
-    df_test = pd.read_csv('../data/ag_news/test.csv')
-    df = pd.concat([df_train, df_test])
-    df_text = df[['Description']].reset_index(drop=True).rename(columns={'Description':'text'})
+    config = configparser.ConfigParser()
+    config.read('w2v.cfg')
 
-    w2v = train_w2v(df_text, 50, 1)
+    # setting up parameters
+    data_path = config['PATH']['data_path']
+    model_save_path = config['PATH']['model_save_path']
 
-    dir_save = '../model/w2v'
-    model_name = 'ag_news' + '.model'
-    w2v.save(os.path.join(dir_save, model_name))
+    dataset = config['MODEL']['dataset']
+    model_name = config['MODEL']['model_name']
+    emb_dim = int(config['MODEL']['embedding_dimension'])
+    min_freq = int(config['MODEL']['min_frequency'])
+
+    # preprocessing
+    df = pd.read_csv(data_path)
+    if dataset == 'ag_news':
+        df_text = df[['Description']].reset_index(drop=True).rename(columns={'Description':'text'})
+    else:
+        print(f'Dataset: {dataset} not recognized.')
+    
+    # train model
+    w2v = train_w2v(df_text, emb_dim, min_freq)
+
+    # save trained model
+    w2v.save(os.path.join(model_save_path, model_name))
