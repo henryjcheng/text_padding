@@ -16,10 +16,11 @@ from gensim.models import Word2Vec
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
+
 from padding import zero_padding
+from net import multilayer_perceptron
 
 ## 1. load dataset
 df = pd.read_csv('../data/ag_news/test.csv')
@@ -57,22 +58,8 @@ dataiter = iter(loader_test)
 text, labels = dataiter.next()
 
 # load model
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(245 * 50 * 1, 120) # 120 chosen randomly (< 245*50*1)
-        self.fc2 = nn.Linear(120, 50)           # 50 chosen randomly (< 50)
-        self.fc3 = nn.Linear(50, 4)             # 4 = number of classes
-    
-    def forward(self, x):
-        x = x.view(-1, 245 * 50 * 1)   # token length, w2v embedding dimension, channel
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
-
 PATH = '../model/cnn/3fc_pad_random.pth'
-net = Net()
+net = multilayer_perceptron()
 net.load_state_dict(torch.load(PATH))
 
 correct = 0
