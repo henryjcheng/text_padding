@@ -21,14 +21,17 @@ def zero_padding(list_to_pad, max_length, pad_dimension, pad_method='bottom'):
     # find number of padding vector needed
     num_pad = max_length - len(list_to_pad)
 
-    vector_pad = np.asarray([0] * pad_dimension, dtype=np.float32)
-    vector_pad = [vector_pad]    # convert to list of np.ndarray so we can append together 
+    if pad_method == 'bottom':
+        vector_pad = np.asarray([0] * pad_dimension, dtype=np.float32)
+        vector_pad = [vector_pad]    # convert to list of np.ndarray so we can append together 
 
-    iteration = 0
-    while iteration < num_pad:
-        list_to_pad = np.append(list_to_pad, vector_pad, axis=0)
-        iteration += 1
-    
+        iteration = 0
+        while iteration < num_pad:
+            list_to_pad = np.append(list_to_pad, vector_pad, axis=0)
+            iteration += 1
+    else:
+        raise ValueError(f'{pad_method} is not a valid padding method.')
+
     return list_to_pad
 
 def zero_padding_bothside(list_to_pad, max_length, pad_dimension):
