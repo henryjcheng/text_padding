@@ -35,7 +35,7 @@ shuffle = config['MODEL_PARAMETERS'].getboolean('shuffle')
 epoch = int(config['MODEL_PARAMETERS']['epoch'])
 
 ## 1. load dataset
-df = pd.read_csv(data_path, nrows=5000)
+df = pd.read_csv(data_path)
 
 # convert class 4 to class 0
 df['Class Index'] = df['Class Index'].replace(4, 0)
@@ -49,7 +49,6 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 ## 3. zero pad to max length
 df['text_length'] = df['text_token'].apply(lambda x: len(x))
 max_length = max(df['text_length'])
-max_length = 245
 
 print(f'max length: {max_length}')
 
@@ -107,4 +106,4 @@ for run in range(epoch):
 
 torch.save(net.state_dict(), model_save_path)
 
-print('Process complete.')
+print('\nProcess complete.')
