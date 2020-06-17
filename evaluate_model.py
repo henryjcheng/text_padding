@@ -1,16 +1,10 @@
-__author__ = "Henry Cheng"
-__email__ = "henryjcheng@gmail.com"
-__status__ = "dev"
 """
-This module contains codes to test/evaluate CNN multi-class classification model.
-Program flow:
-
-Future dev:
-    1. combine this into train_3fc.py
+This module contains code to evaluate model against test set.
+The module takes input from model.cfg file.
 """
 import random
-import numpy as np
 import pandas as pd
+import configparser
 from nltk.tokenize import word_tokenize
 from gensim.models import Word2Vec
 
@@ -20,10 +14,24 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 from padding import zero_padding
-from net import CNN
+from net import multilayer_perceptron, CNN
+
+## 0. setting up parameter
+config = configparser.ConfigParser()
+config.read('model.cfg') 
+
+## PATH
+data_path = config['PATH']['test_data_path']
+w2v_path = config['PATH']['w2v_path']
+model_save_path = config['PATH']['model_save_path']
+
+## MODEL_PARAMETERS
+model_type = config['MODEL_PARAMETERS']['model_type']
+emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
+pad_method = config['MODEL_PARAMETERS']['pad_method']
 
 ## 1. load dataset
-df = pd.read_csv('../data/ag_news/test.csv')
+df = pd.read_csv(data_path)
 # convert class 4 to class 0
 df['Class Index'] = df['Class Index'].replace(4, 0)
 print(df['Class Index'].value_counts())
@@ -31,7 +39,7 @@ print(df['Class Index'].value_counts())
 ## 2. apply tokenization and embedding
 df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
 
-w2v = Word2Vec.load('../model/w2v/ag_news.model')
+w2v = Word2Vec.load(w2v_path)
 df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
 ## 3. zero pad to max length
@@ -41,15 +49,10 @@ max_length = 245    # specify max length from train set
 
 print(f'max length: {max_length}')
 
-emb_dim = 50
-pad_method = 'bottom'
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
-test_x = df['embedding'].tolist()
-tensor_x = torch.tensor(test_x)
-
-test_y = df['Class Index'].tolist()
-tensor_y = torch.tensor(test_y, dtype=torch.long)
+tensor_x = torch.tensor(df['embedding'].tolist())
+tensor_y = torch.tensor(df['Class Index'].tolist(), dtype=torch.long)
 
 data_test= TensorDataset(tensor_x, tensor_y) # create your datset
 loader_test = DataLoader(data_test, batch_size=32, shuffle=True) # create your dataloader
@@ -58,16 +61,21 @@ dataiter = iter(loader_test)
 text, labels = dataiter.next()
 
 # load model
-PATH = '../model/cnn/cnn_pad_bottom.pth'
-net = CNN()
-net.load_state_dict(torch.load(PATH))
+if model_type == 'MP':
+    net = multilayer_perceptron()
+elif model_type == 'CNN':
+    net = CNN()
+else:
+    raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
+net.load_state_dict(torch.load(model_save_path))
 
 correct = 0
 total = 0
 with torch.no_grad():
     for data in loader_test:
         text, labels = data
-        text = text.unsqueeze(1)    # reshape text to add 1 channel
+        if model_type == 'CNN':
+            text = text.unsqueeze(1)    # reshape text to add 1 channel
 
         outputs = net(text)
         _, predicted = torch.max(outputs.data, 1)
@@ -81,8 +89,9 @@ class_total = list(0. for i in range(4))
 with torch.no_grad():
     for batch, data in enumerate(loader_test):
         text, labels = data
-        text = text.unsqueeze(1)    # reshape text to add 1 channel
-
+        if model_type == 'CNN':
+            text = text.unsqueeze(1)    # reshape text to add 1 channel
+            
         outputs = net(text)
         _, predicted = torch.max(outputs, 1)
         c = (predicted == labels).squeeze()
