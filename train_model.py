@@ -77,7 +77,7 @@ tensor_x = torch.tensor(df['embedding'].tolist())
 tensor_y = torch.tensor(df['Class Index'].tolist(), dtype=torch.long)
 
 data_train = TensorDataset(tensor_x, tensor_y) # create your datset
-loader_train = DataLoader(data_train, batch_size=32, shuffle=True) # create your dataloader
+loader_train = DataLoader(data_train, batch_size=batch_size, shuffle=shuffle) # create your dataloader
 
 ## 6. train and save model
 for run in range(epoch):
