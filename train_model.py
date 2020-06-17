@@ -21,13 +21,18 @@ config = configparser.ConfigParser()
 config.read('model.cfg') 
 
 ## PATH
-data_path = config['PATH']['data_path']
+data_path = config['PATH']['train_data_path']
 w2v_path = config['PATH']['w2v_path']
+model_save_path = config['PATH']['model_save_path']
 
 ## MODEL_PARAMETERS
 model_type = config['MODEL_PARAMETERS']['model_type']
 emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
 pad_method = config['MODEL_PARAMETERS']['pad_method']
+
+batch_size = int(config['MODEL_PARAMETERS']['batch_size'])
+shuffle = config['MODEL_PARAMETERS'].getboolean('shuffle')
+epoch = int(config['MODEL_PARAMETERS']['epoch'])
 
 ## 1. load dataset
 df = pd.read_csv(data_path, nrows=5000)
@@ -44,6 +49,7 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 ## 3. zero pad to max length
 df['text_length'] = df['text_token'].apply(lambda x: len(x))
 max_length = max(df['text_length'])
+max_length = 245
 
 print(f'max length: {max_length}')
 
@@ -68,24 +74,22 @@ print(f'\ndevice: {device}')
 net.to(device)
 
 ## 5. create training pipeline
-train_x = df['embedding'].tolist()
-tensor_x = torch.tensor(train_x)
-
-train_y = df['Class Index'].tolist()
-tensor_y = torch.tensor(train_y, dtype=torch.long)
-set(train_y)
+tensor_x = torch.tensor(df['embedding'].tolist())
+tensor_y = torch.tensor(df['Class Index'].tolist(), dtype=torch.long)
 
 data_train = TensorDataset(tensor_x, tensor_y) # create your datset
 loader_train = DataLoader(data_train, batch_size=32, shuffle=True) # create your dataloader
 
 ## 6. train and save model
-for epoch in range(5):
+for run in range(epoch):
     running_loss = 0.0
-    print(f'\nepoch {epoch + 1}')
+    print(f'\nepoch {run + 1}')
     for i, data in enumerate(loader_train):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
-        
+        if model_type == 'CNN':
+            inputs = inputs.unsqueeze(1)    # reshape by add 1 to num_channel (parameter: batch_size, num_channel, height, width)
+
         # zero the parameter gradients
         optimizer.zero_grad()
         
@@ -101,7 +105,6 @@ for epoch in range(5):
             print(f'\tbatch {i}    loss: {running_loss/200}')
         running_loss = 0.0
 
-PATH = '../model/cnn/3fc_pad_random.pth'
-torch.save(net.state_dict(), PATH)
+torch.save(net.state_dict(), model_save_path)
 
 print('Process complete.')

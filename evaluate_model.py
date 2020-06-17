@@ -1,12 +1,6 @@
-__author__ = "Henry Cheng"
-__email__ = "henryjcheng@gmail.com"
-__status__ = "dev"
 """
-This module contains codes to test/evaluate CNN multi-class classification model.
-Program flow:
-
-Future dev:
-    1. combine this into train_3fc.py
+This module contains code to evaluate model against test set.
+The module takes input from model.cfg file.
 """
 import random
 import numpy as np
