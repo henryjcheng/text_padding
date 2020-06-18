@@ -1,8 +1,9 @@
 """
-This module contains padding function
+This module contains misc. function used in train_model.py
 """
 import random
 import numpy as np
+import torch
 
 def zero_padding(list_to_pad, max_length, pad_dimension, pad_method='bottom'):
     """
@@ -64,6 +65,47 @@ def zero_padding(list_to_pad, max_length, pad_dimension, pad_method='bottom'):
         raise ValueError(f'{pad_method} is not a valid padding method.')
 
     return list_to_pad
+
+def evaluate_accuracy(loader_test, net, classes, model_type):
+    """
+    This function takes pytorch data loader, pytorch class for NN, 
+    and a tuple of class labels to calculate accuracy at macro and class levels
+    """
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for data in loader_test:
+            text, labels = data
+            if model_type == 'CNN':
+                text = text.unsqueeze(1)    # reshape text to add 1 channel
+
+            outputs = net(text)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    print(f'\nAccuracy: {100 * correct/total}%')
+
+    class_correct = list(0. for i in range(len(classes)))
+    class_total = list(0. for i in range(len(classes)))
+    with torch.no_grad():
+        for batch, data in enumerate(loader_test):
+            text, labels = data
+            if model_type == 'CNN':
+                text = text.unsqueeze(1)    # reshape text to add 1 channel
+
+            outputs = net(text)
+            _, predicted = torch.max(outputs, 1)
+            c = (predicted == labels).squeeze()
+
+            for i in range(len(labels)):
+                label = labels[i]
+                class_correct[label] += c[i].item()
+                class_total[label] += 1
+
+    for i in range(4):
+        print('Accuracy of class %5s : %2d %%' % (
+            classes[i], 100 * class_correct[i] / (class_total[i] + .000001)))
 
 if __name__ == "__main__":
     pass

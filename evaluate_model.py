@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-from padding import zero_padding
+from utility import zero_padding, evaluate_accuracy
 from net import multilayer_perceptron, CNN
 
 ## 0. setting up parameter
@@ -29,6 +29,8 @@ model_save_path = config['PATH']['model_save_path']
 model_type = config['MODEL_PARAMETERS']['model_type']
 emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
 pad_method = config['MODEL_PARAMETERS']['pad_method']
+
+classes = ('0', '1', '2', '3')
 
 ## 1. load dataset
 df = pd.read_csv(data_path)
@@ -69,40 +71,5 @@ else:
     raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
 net.load_state_dict(torch.load(model_save_path))
 
-correct = 0
-total = 0
-with torch.no_grad():
-    for data in loader_test:
-        text, labels = data
-        if model_type == 'CNN':
-            text = text.unsqueeze(1)    # reshape text to add 1 channel
-
-        outputs = net(text)
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-
-print(f'\nAccuracy: {100 * correct/total}%')
-
-class_correct = list(0. for i in range(4))
-class_total = list(0. for i in range(4))
-with torch.no_grad():
-    for batch, data in enumerate(loader_test):
-        text, labels = data
-        if model_type == 'CNN':
-            text = text.unsqueeze(1)    # reshape text to add 1 channel
-            
-        outputs = net(text)
-        _, predicted = torch.max(outputs, 1)
-        c = (predicted == labels).squeeze()
-
-        for i in range(len(labels)):
-            label = labels[i]
-            class_correct[label] += c[i].item()
-            class_total[label] += 1
-
-classes = ('0', '1', '2', '3')
-
-for i in range(4):
-    print('Accuracy of class %5s : %2d %%' % (
-        classes[i], 100 * class_correct[i] / (class_total[i] + .000001)))
+evaluate_accuracy(loader_test, net, classes, model_type)
+        
