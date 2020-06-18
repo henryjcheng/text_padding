@@ -30,6 +30,8 @@ model_type = config['MODEL_PARAMETERS']['model_type']
 emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
 pad_method = config['MODEL_PARAMETERS']['pad_method']
 
+classes = ('0', '1', '2', '3')
+
 ## 1. load dataset
 df = pd.read_csv(data_path)
 # convert class 4 to class 0
@@ -68,8 +70,6 @@ elif model_type == 'CNN':
 else:
     raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
 net.load_state_dict(torch.load(model_save_path))
-
-classes = ('0', '1', '2', '3')
 
 evaluate_accuracy(loader_test, net, classes, model_type)
         
