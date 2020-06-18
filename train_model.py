@@ -26,7 +26,7 @@ w2v_path = config['PATH']['w2v_path']
 model_save_path = config['PATH']['model_save_path']
 
 ## MODEL_PARAMETERS
-sample = config['MODEL_PARAMETERS']['sample']
+sample = config['MODEL_PARAMETERS'].getboolean('sample')
 model_type = config['MODEL_PARAMETERS']['model_type']
 emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
 pad_method = config['MODEL_PARAMETERS']['pad_method']
@@ -109,8 +109,8 @@ for run in range(epoch):
         
         # print statistics
         running_loss += loss.item()
-        if i and i % 50 == 0:
-            print(f'\tbatch {i}    loss: {running_loss/50}')
+        if i and i % 200 == 0:
+            print(f'\tbatch {i}    loss: {running_loss/200}')
             running_loss = 0.0
 
 torch.save(net.state_dict(), model_save_path)
