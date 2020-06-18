@@ -26,6 +26,7 @@ w2v_path = config['PATH']['w2v_path']
 model_save_path = config['PATH']['model_save_path']
 
 ## MODEL_PARAMETERS
+sample = config['MODEL_PARAMETERS']['sample']
 model_type = config['MODEL_PARAMETERS']['model_type']
 emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
 pad_method = config['MODEL_PARAMETERS']['pad_method']
@@ -35,7 +36,10 @@ shuffle = config['MODEL_PARAMETERS'].getboolean('shuffle')
 epoch = int(config['MODEL_PARAMETERS']['epoch'])
 
 ## 1. load dataset
-df = pd.read_csv(data_path)
+if sample:
+    df = pd.read_csv(data_path, nrows=5000)
+else:
+    df = pd.read_csv(data_path)
 
 # convert class 4 to class 0
 df['Class Index'] = df['Class Index'].replace(4, 0)
@@ -48,9 +52,12 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
 ## 3. zero pad to max length
 df['text_length'] = df['text_token'].apply(lambda x: len(x))
-max_length = max(df['text_length'])
+if sample:
+    max_length = 245
+else:
+    max_length = max(df['text_length'])
 
-print(f'max length: {max_length}')
+print(f'sample is {sample}, max length: {max_length}')
 
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
