@@ -57,7 +57,7 @@ if sample:
 else:
     max_length = max(df['text_length'])
 
-print(f'sample is {sample}, max length: {max_length}')
+print(f'sample is {sample},    training size: {df.shape[0]},    max length: {max_length}')
 
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
@@ -109,8 +109,8 @@ for run in range(epoch):
         
         # print statistics
         running_loss += loss.item()
-        if i and i % 200 == 0:
-            print(f'\tbatch {i}    loss: {running_loss/200}')
+        if i and i % 50 == 0:
+            print(f'\tbatch {i}    loss: {running_loss/50}')
             running_loss = 0.0
 
 torch.save(net.state_dict(), model_save_path)
