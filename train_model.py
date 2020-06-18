@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-from padding import zero_padding
+from utility import zero_padding
 from net import multilayer_perceptron, CNN
 
 ## 0. setting up parameter
