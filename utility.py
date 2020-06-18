@@ -76,7 +76,7 @@ def evaluate_accuracy(loader_test, net, classes, model_type):
     with torch.no_grad():
         for data in loader_test:
             text, labels = data
-            if model_type == 'CNN':
+            if model_type != 'MP':
                 text = text.unsqueeze(1)    # reshape text to add 1 channel
 
             outputs = net(text)
@@ -91,7 +91,7 @@ def evaluate_accuracy(loader_test, net, classes, model_type):
     with torch.no_grad():
         for batch, data in enumerate(loader_test):
             text, labels = data
-            if model_type == 'CNN':
+            if model_type != 'MP':
                 text = text.unsqueeze(1)    # reshape text to add 1 channel
 
             outputs = net(text)

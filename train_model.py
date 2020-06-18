@@ -14,7 +14,7 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding
-from net import multilayer_perceptron, CNN
+from net import multilayer_perceptron, CNN, CNN_kim
 
 ## 0. setting up parameter
 config = configparser.ConfigParser()
@@ -66,6 +66,8 @@ if model_type == 'MP':
     net = multilayer_perceptron()
 elif model_type == 'CNN':
     net = CNN()
+elif model_type == 'CNN_kim':
+    net = CNN_kim()
 else:
     raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
     
@@ -93,7 +95,7 @@ for run in range(epoch):
     for i, data in enumerate(loader_train):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
-        if model_type == 'CNN':
+        if model_type != 'MP':
             inputs = inputs.unsqueeze(1)    # reshape by add 1 to num_channel (parameter: batch_size, num_channel, height, width)
 
         # zero the parameter gradients
