@@ -111,7 +111,7 @@ for run in range(epoch):
         running_loss += loss.item()
         if i and i % 200 == 0:
             print(f'\tbatch {i}    loss: {running_loss/200}')
-        running_loss = 0.0
+            running_loss = 0.0
 
 torch.save(net.state_dict(), model_save_path)
 
