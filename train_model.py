@@ -2,6 +2,7 @@
 This module contains code to train model.
 The module takes input from model.cfg file.
 """
+import time
 import random
 import pandas as pd
 import configparser
@@ -94,6 +95,8 @@ loader_train = DataLoader(data_train, batch_size=batch_size, shuffle=shuffle) # 
 for run in range(epoch):
     running_loss = 0.0
     print(f'\nepoch {run + 1}')
+    time0_epoch = time.time()
+
     for i, data in enumerate(loader_train):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
@@ -114,6 +117,9 @@ for run in range(epoch):
         if i and i % 200 == 0:
             print(f'\tbatch {i}    loss: {running_loss/200}')
             running_loss = 0.0
+    
+    time_diff_epoch = round(time.time() - time0_epoch, 2)
+    print(f'\tTime elapsed: {time_diff_epoch}')
 
 torch.save(net.state_dict(), model_save_path)
 
