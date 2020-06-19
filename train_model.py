@@ -14,7 +14,7 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding
-from net import multilayer_perceptron, CNN
+from net import multilayer_perceptron, CNN, CNN_kim
 
 ## 0. setting up parameter
 config = configparser.ConfigParser()
@@ -26,7 +26,7 @@ w2v_path = config['PATH']['w2v_path']
 model_save_path = config['PATH']['model_save_path']
 
 ## MODEL_PARAMETERS
-sample = config['MODEL_PARAMETERS']['sample']
+sample = config['MODEL_PARAMETERS'].getboolean('sample')
 model_type = config['MODEL_PARAMETERS']['model_type']
 emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
 pad_method = config['MODEL_PARAMETERS']['pad_method']
@@ -57,7 +57,7 @@ if sample:
 else:
     max_length = max(df['text_length'])
 
-print(f'sample is {sample}, max length: {max_length}')
+print(f'sample is {sample},    training size: {df.shape[0]},    max length: {max_length}')
 
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
@@ -66,6 +66,8 @@ if model_type == 'MP':
     net = multilayer_perceptron()
 elif model_type == 'CNN':
     net = CNN()
+elif model_type == 'CNN_kim':
+    net = CNN_kim()
 else:
     raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
     
@@ -93,7 +95,7 @@ for run in range(epoch):
     for i, data in enumerate(loader_train):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
-        if model_type == 'CNN':
+        if model_type != 'MP':
             inputs = inputs.unsqueeze(1)    # reshape by add 1 to num_channel (parameter: batch_size, num_channel, height, width)
 
         # zero the parameter gradients
@@ -109,7 +111,7 @@ for run in range(epoch):
         running_loss += loss.item()
         if i and i % 200 == 0:
             print(f'\tbatch {i}    loss: {running_loss/200}')
-        running_loss = 0.0
+            running_loss = 0.0
 
 torch.save(net.state_dict(), model_save_path)
 
