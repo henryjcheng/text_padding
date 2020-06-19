@@ -14,7 +14,7 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding, evaluate_accuracy
-from net import multilayer_perceptron, CNN, CNN_kim
+from net import multilayer_perceptron, CNN, CNN_kim, CNN_deep
 
 ## 0. setting up parameter
 config = configparser.ConfigParser()
@@ -69,6 +69,8 @@ elif model_type == 'CNN':
     net = CNN()
 elif model_type == 'CNN_kim':
     net = CNN_kim()
+elif model_type == 'CNN_deep':
+    net = CNN_deep()
 else:
     raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
 net.load_state_dict(torch.load(model_save_path))

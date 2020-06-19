@@ -67,18 +67,48 @@ class CNN_deep(nn.Module):
     def __init__(self):
         super(CNN_deep, self).__init__()
         self.conv1 = nn.Conv2d(1, 64, (3, 50))
+
+        # Conv block 1
         self.conv2 = nn.Conv2d(64, 64, (3, 1))
         self.conv2_bn = nn.BatchNorm2d(64)
-        self.pool2 = nn.MaxPool2d(kernel_size=(122, 1), stride=(1, 1))  # halve the dimension
-        self.fc1 = nn.Linear(120 * 1 * 128, 4096)
+        self.pool2 = nn.MaxPool2d(kernel_size=(120, 1), stride=(1, 1))  # halve the dimension
+
+        # Conv block 2
+        self.conv3 = nn.Conv2d(128, 128, (3, 1))
+        self.conv3_bn = nn.BatchNorm2d(128)
+        self.pool3 = nn.MaxPool2d(kernel_size=(59, 1), stride=(1, 1))    # halve the dimension
+
+        # Conv block 3
+        self.conv4 = nn.Conv2d(256, 256, (3, 1))
+        self.conv4_bn = nn.BatchNorm2d(256)
+        self.pool4 = nn.MaxPool2d(kernel_size=(28, 1), stride=(1, 1))   # halve the dimension
+
+        self.fc1 = nn.Linear(27 * 1 * 512, 4096)
         self.fc2 = nn.Linear(4096, 2048)
         self.fc3 = nn.Linear(2048, 4)
     
     def forward(self, x):
         x = self.conv1(x)
-        x = self.pool2(F.relu(self.conv2_bn(self.conv2(x))))
+
+        # Conv block 1
+        x = F.relu(self.conv2_bn(self.conv2(x)))
+        x = F.relu(self.conv2_bn(self.conv2(x)))
+        x = self.pool2(x)
         x = torch.cat((x, x), dim=1)        # doubling the feature space
-        x = x.view(-1, 120 * 1 * 128)
+
+        # Conv block 2
+        x = F.relu(self.conv3_bn(self.conv3(x)))
+        x = F.relu(self.conv3_bn(self.conv3(x)))
+        x = self.pool3(x)
+        x = torch.cat((x, x), dim=1)        # doubling the feature space
+
+        # Conv block 3
+        x = F.relu(self.conv4_bn(self.conv4(x)))
+        x = F.relu(self.conv4_bn(self.conv4(x)))
+        x = self.pool4(x)
+        x = torch.cat((x, x), dim=1)        # doubling the feature space
+
+        x = x.view(-1, 27 * 1 * 512)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
