@@ -2,6 +2,7 @@
 This module contains code to train model.
 The module takes input from model.cfg file.
 """
+import os
 import time
 import random
 import pandas as pd
@@ -25,6 +26,7 @@ config.read('model.cfg')
 data_path = config['PATH']['train_data_path']
 w2v_path = config['PATH']['w2v_path']
 model_save_path = config['PATH']['model_save_path']
+model_name = config['PATH']['model_name']
 
 ## MODEL_PARAMETERS
 sample = config['MODEL_PARAMETERS'].getboolean('sample')
@@ -121,6 +123,13 @@ for run in range(epoch):
     time_diff_epoch = round(time.time() - time0_epoch, 2)
     print(f'\tTime elapsed: {time_diff_epoch}')
 
-torch.save(net.state_dict(), model_save_path)
+    # save a model at every 5 epoch
+    model_name_temp = model_name + f'_epoch{run+1}' + '.pth'
+    model_save_path_full = os.path.join(model_save_path, model_name_temp)
+    torch.save(net.state_dict(), model_save_path_full)
+
+model_name_temp = model_name + '.pth'
+model_save_path_full = os.path.join(model_save_path, model_name_temp)
+torch.save(net.state_dict(), model_save_path_full)
 
 print('\nProcess complete.')
