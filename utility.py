@@ -4,6 +4,7 @@ This module contains misc. function used in train_model.py
 import random
 import numpy as np
 import torch
+import net
 
 def zero_padding(list_to_pad, max_length, pad_dimension, pad_method='bottom'):
     """
@@ -106,6 +107,25 @@ def evaluate_accuracy(loader_test, net, classes, model_type):
     for i in range(4):
         print('Accuracy of class %5s : %2d %%' % (
             classes[i], 100 * class_correct[i] / (class_total[i] + .000001)))
+
+def model_loader(model_type):
+    """
+    This function loads model from net.py
+    """
+    if model_type == 'MP':
+        net = net.multilayer_perceptron()
+    elif model_type == 'CNN':
+        net = net.CNN()
+    elif model_type == 'CNN_kim':
+        net = net.CNN_kim()
+    elif model_type == 'CNN_deep':
+        net = net.CNN_deep()
+    else:
+        raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
+
+    return net
+
+
 
 if __name__ == "__main__":
     pass

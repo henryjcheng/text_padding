@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-from utility import zero_padding, evaluate_accuracy
+from utility import zero_padding, evaluate_accuracy, model_loader
 from net import multilayer_perceptron, CNN, CNN_kim, CNN_deep
 
 ## 0. setting up parameter
@@ -63,16 +63,7 @@ dataiter = iter(loader_test)
 text, labels = dataiter.next()
 
 # load model
-if model_type == 'MP':
-    net = multilayer_perceptron()
-elif model_type == 'CNN':
-    net = CNN()
-elif model_type == 'CNN_kim':
-    net = CNN_kim()
-elif model_type == 'CNN_deep':
-    net = CNN_deep()
-else:
-    raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
+net = model_loader(model_type)
 net.load_state_dict(torch.load(model_save_path))
 
 evaluate_accuracy(loader_test, net, classes, model_type)

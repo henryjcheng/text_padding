@@ -15,7 +15,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-from utility import zero_padding
+from utility import zero_padding, model_loader
 from net import multilayer_perceptron, CNN, CNN_kim, CNN_deep
 
 ## 0. setting up parameter
@@ -65,16 +65,7 @@ print(f'sample is {sample},    training size: {df.shape[0]},    max length: {max
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
 ## 4. load nn architecture
-if model_type == 'MP':
-    net = multilayer_perceptron()
-elif model_type == 'CNN':
-    net = CNN()
-elif model_type == 'CNN_kim':
-    net = CNN_kim()
-elif model_type == 'CNN_deep':
-    net = CNN_deep()
-else:
-    raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
+net = model_loader(model_type)
     
 # define loss function and optimizer
 criterion = nn.CrossEntropyLoss()
