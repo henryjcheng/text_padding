@@ -123,11 +123,10 @@ for run in range(epoch):
     time_diff_epoch = round(time.time() - time0_epoch, 2)
     print(f'\tTime elapsed: {time_diff_epoch}')
 
-    # save a model at every 5 epoch
-    if (run + 1) % 5 == 0:
-        model_name_temp = model_name + f'_epoch{run+1}' + '.pth'
-        model_save_path_full = os.path.join(model_save_path, model_name_temp)
-        torch.save(net.state_dict(), model_save_path_full)
+
+    model_name_temp = model_name + f'_epoch{run+1}' + '.pth'
+    model_save_path_full = os.path.join(model_save_path, model_name_temp)
+    torch.save(net.state_dict(), model_save_path_full)
 
 model_name_temp = model_name + '.pth'
 model_save_path_full = os.path.join(model_save_path, model_name_temp)
