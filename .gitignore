@@ -1,5 +1,6 @@
 .ipynb_checkpoints/
 test.py
+log*
 
 # python
 __pycache__
