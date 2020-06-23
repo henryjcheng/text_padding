@@ -2,6 +2,7 @@
 This module contains code to evaluate model against test set.
 The module takes input from model.cfg file.
 """
+import os
 import random
 import pandas as pd
 import configparser
@@ -14,7 +15,7 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding, evaluate_accuracy, model_loader
-from net import multilayer_perceptron, CNN, CNN_kim, CNN_deep
+from nets import multilayer_perceptron, CNN, CNN_kim, CNN_deep
 
 ## 0. setting up parameter
 config = configparser.ConfigParser()
@@ -24,6 +25,7 @@ config.read('model.cfg')
 data_path = config['PATH']['test_data_path']
 w2v_path = config['PATH']['w2v_path']
 model_save_path = config['PATH']['model_save_path']
+model_name = config['PATH']['model_name']
 
 ## MODEL_PARAMETERS
 model_type = config['MODEL_PARAMETERS']['model_type']
@@ -64,7 +66,11 @@ text, labels = dataiter.next()
 
 # load model
 net = model_loader(model_type)
-net.load_state_dict(torch.load(model_save_path))
+model_name_temp = model_name + '.pth'
+model_save_path_full = os.path.join(model_save_path, model_name_temp)
+
+net.load_state_dict(torch.load(model_save_path_full))
+net.eval()
 
 evaluate_accuracy(loader_test, net, classes, model_type)
         

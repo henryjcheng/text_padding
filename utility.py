@@ -4,7 +4,7 @@ This module contains misc. function used in train_model.py
 import random
 import numpy as np
 import torch
-import net
+import nets
 
 def zero_padding(list_to_pad, max_length, pad_dimension, pad_method='bottom'):
     """
@@ -113,13 +113,13 @@ def model_loader(model_type):
     This function loads model from net.py
     """
     if model_type == 'MP':
-        net = net.multilayer_perceptron()
+        net = nets.multilayer_perceptron()
     elif model_type == 'CNN':
-        net = net.CNN()
+        net = nets.CNN()
     elif model_type == 'CNN_kim':
-        net = net.CNN_kim()
+        net = nets.CNN_kim()
     elif model_type == 'CNN_deep':
-        net = net.CNN_deep()
+        net = nets.CNN_deep()
     else:
         raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
 

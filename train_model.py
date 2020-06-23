@@ -16,7 +16,6 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding, model_loader
-from net import multilayer_perceptron, CNN, CNN_kim, CNN_deep
 
 ## 0. setting up parameter
 config = configparser.ConfigParser()
@@ -37,6 +36,11 @@ pad_method = config['MODEL_PARAMETERS']['pad_method']
 batch_size = int(config['MODEL_PARAMETERS']['batch_size'])
 shuffle = config['MODEL_PARAMETERS'].getboolean('shuffle')
 epoch = int(config['MODEL_PARAMETERS']['epoch'])
+
+## CONTINUOUS TRAINING PARAMETERS
+continuous_train = config['CONTINUOUS_TRAINING'].getboolean('continuous_train')
+model_checkpoint_path = config['CONTINUOUS_TRAINING']['model_checkpoint_path']
+epochs_left = int(config['CONTINUOUS_TRAINING']['epochs_left'])
 
 ## 1. load dataset
 if sample:
@@ -66,7 +70,11 @@ df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, em
 
 ## 4. load nn architecture
 net = model_loader(model_type)
-    
+if continuous_train:
+    checkpoint = torch.load(model_checkpoint_path)
+    net = net.load_state_dict(checkpoint['state_dict'])
+    epoch = epochs_left
+
 # define loss function and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -114,8 +122,10 @@ for run in range(epoch):
     time_diff_epoch = round(time.time() - time0_epoch, 2)
     print(f'\tTime elapsed: {time_diff_epoch}')
 
-
-    model_name_temp = model_name + f'_epoch{run+1}' + '.pth'
+    if continuous_train:
+        model_name_temp = model_name + f'_ct_epoch{run+1}' + '.pth'
+    else:
+        model_name_temp = model_name + f'_epoch{run+1}' + '.pth'
     model_save_path_full = os.path.join(model_save_path, model_name_temp)
     torch.save(net.state_dict(), model_save_path_full)
 
