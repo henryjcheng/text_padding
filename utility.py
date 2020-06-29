@@ -125,7 +125,19 @@ def model_loader(model_type):
 
     return net
 
+def vocab_clean_up(token_list, w2v):
+    """
+    This function removes words not in w2v vocab list.
+    Meant to be used in lambda function. eg. df['text_clean'] = df['text'].apply(lambda x: vocab_clean_up(x, w2v))
+    """
+    vocab_list = w2v.wv
+    temp_list = []
 
+    for token in token_list:
+        if token in vocab_list:
+            temp_list.append(token)
+
+    return temp_list
 
 if __name__ == "__main__":
     pass

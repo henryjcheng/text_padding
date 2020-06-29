@@ -14,7 +14,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-from utility import zero_padding, evaluate_accuracy, model_loader
+from utility import zero_padding, evaluate_accuracy, model_loader, vocab_clean_up
 from nets import multilayer_perceptron, CNN, CNN_kim, CNN_deep
 
 ## 0. setting up parameter
@@ -44,6 +44,7 @@ print(df['Class Index'].value_counts())
 df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
 
 w2v = Word2Vec.load(w2v_path)
+df['text_token'] = df['text_token'].apply(lambda x: vocab_clean_up(x, w2v))
 df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
 ## 3. zero pad to max length
