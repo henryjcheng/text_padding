@@ -1,6 +1,7 @@
 .ipynb_checkpoints/
 test.py
 log*
+sandbox.ipynb
 
 # python
 __pycache__
