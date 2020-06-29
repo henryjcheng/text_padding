@@ -93,6 +93,7 @@ data_train = TensorDataset(tensor_x, tensor_y) # create your datset
 loader_train = DataLoader(data_train, batch_size=batch_size, shuffle=shuffle) # create your dataloader
 
 ## 6. train and save model
+save_every_epoch = False
 for run in range(epoch):
     running_loss = 0.0
     print(f'\nepoch {run + 1}')
@@ -122,12 +123,9 @@ for run in range(epoch):
     time_diff_epoch = round(time.time() - time0_epoch, 2)
     print(f'\tTime elapsed: {time_diff_epoch}')
 
-    if continuous_train:
-        model_name_temp = model_name + f'_ct_epoch{run+1}' + '.pth'
-    else:
-        model_name_temp = model_name + f'_epoch{run+1}' + '.pth'
-    model_save_path_full = os.path.join(model_save_path, model_name_temp)
-    torch.save(net.state_dict(), model_save_path_full)
+    if save_every_epoch:
+        model_save_path_full = os.path.join(model_save_path, model_name_temp)
+        torch.save(net.state_dict(), model_save_path_full)
 
 model_name_temp = model_name + '.pth'
 model_save_path_full = os.path.join(model_save_path, model_name_temp)
