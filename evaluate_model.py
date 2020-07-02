@@ -60,7 +60,7 @@ tensor_x = torch.tensor(df['embedding'].tolist())
 tensor_y = torch.tensor(df['Class Index'].tolist(), dtype=torch.long)
 
 data_test= TensorDataset(tensor_x, tensor_y) # create your datset
-loader_test = DataLoader(data_test, batch_size=32, shuffle=True) # create your dataloader
+loader_test = DataLoader(data_test, batch_size=32, shuffle=False) # create your dataloader
 
 dataiter = iter(loader_test)
 text, labels = dataiter.next()
