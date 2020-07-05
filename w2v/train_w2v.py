@@ -76,9 +76,12 @@ if __name__ == "__main__":
     min_freq = int(config['MODEL']['min_frequency'])
 
     # preprocessing
-    df = pd.read_csv(data_path)
     if dataset == 'ag_news':
+        df = pd.read_csv(data_path)
         df_text = df[['Description']].reset_index(drop=True).rename(columns={'Description':'text'})
+    if dataset == 'yelp_review_polarity':
+        df = pd.read_csv(data_path, header=0, names=['label', 'text'])
+        df_text = df[['text']].reset_index(drop=True)
     else:
         print(f'Dataset: {dataset} not recognized.')
     

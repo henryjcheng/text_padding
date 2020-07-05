@@ -15,7 +15,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-from utility import zero_padding, model_loader
+from utility import zero_padding, model_loader, vocab_clean_up
 
 ## 0. setting up parameter
 config = configparser.ConfigParser()
@@ -26,6 +26,7 @@ data_path = config['PATH']['train_data_path']
 w2v_path = config['PATH']['w2v_path']
 model_save_path = config['PATH']['model_save_path']
 model_name = config['PATH']['model_name']
+dataset = config['PATH']['dataset']
 
 ## MODEL_PARAMETERS
 sample = config['MODEL_PARAMETERS'].getboolean('sample')
@@ -44,21 +45,33 @@ epochs_left = int(config['CONTINUOUS_TRAINING']['epochs_left'])
 
 ## 1. load dataset
 if sample:
-    df = pd.read_csv(data_path, nrows=5000)
+    nrows = 5000
 else:
-    df = pd.read_csv(data_path)
+    nrows = None
 
-# convert class 4 to class 0
-df['Class Index'] = df['Class Index'].replace(4, 0)
+if dataset == 'ag_news':
+    df = pd.read_csv(data_path, nrows=nrows)
+    df['Class Index'] = df['Class Index'].replace(4, 0)
+    df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
+elif dataset == 'yelp_review_polarity':
+    df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
+    df['label'] = df['label'].replace(2, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+else:
+    print(f'Dataset: {dataset} is not recognized.')
 
 ## 2. apply tokenization and embedding
-df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
-
 w2v = Word2Vec.load(w2v_path)
+df['text_token'] = df['text_token'].apply(lambda x: vocab_clean_up(x, w2v))
+
+# clean up rows with empty embedding
+df['text_length'] = df['text_token'].apply(lambda x: len(x))
+df = df[df['text_length'] > 0].reset_index(drop=True)
+
 df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
 ## 3. zero pad to max length
-df['text_length'] = df['text_token'].apply(lambda x: len(x))
+#df['text_length'] = df['text_token'].apply(lambda x: len(x))
 if sample:
     max_length = 245
 else:
