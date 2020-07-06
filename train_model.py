@@ -52,8 +52,10 @@ else:
 if dataset == 'ag_news':
     df = pd.read_csv(data_path, nrows=nrows)
     df['Class Index'] = df['Class Index'].replace(4, 0)
+    df = df.rename(columns={'Class Index':'label'})
     df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
 elif dataset == 'yelp_review_polarity':
+    nrows=50000    # so it fits into 32Gb RAM
     df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
@@ -67,30 +69,40 @@ df['text_token'] = df['text_token'].apply(lambda x: vocab_clean_up(x, w2v))
 # clean up rows with empty embedding
 df['text_length'] = df['text_token'].apply(lambda x: len(x))
 df = df[df['text_length'] > 0].reset_index(drop=True)
+# reduce footprint
+if dataset == 'ag_news':
+    df = df
+elif dataset == 'yelp_review_polarity':
+    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
+else:
+    print(f'Dataset: {dataset} is not recognized.')
 
 df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
 ## 3. zero pad to max length
-#df['text_length'] = df['text_token'].apply(lambda x: len(x))
-if sample:
+if dataset == 'ag_news':
     max_length = 245
+elif dataset == 'yelp_review_polarity':
+    max_length = 1500
 else:
-    max_length = max(df['text_length'])
+    print(f'Dataset: {dataset} is not recognized.')
 
 print(f'sample is {sample},    training size: {df.shape[0]},    max length: {max_length}')
 
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
 ## 4. load nn architecture
-net = model_loader(model_type)
-if continuous_train:
-    checkpoint = torch.load(model_checkpoint_path)
-    net = net.load_state_dict(checkpoint['state_dict'])
-    epoch = epochs_left
+net = model_loader(model_type, dataset)
 
 # define loss function and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
+if continuous_train:
+    print('\nTraining from checkpoint.')
+    checkpoint = torch.load(model_checkpoint_path)
+    net.load_state_dict(checkpoint['state_dict'])
+    epoch = epochs_left
 
 # train on GPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
@@ -100,7 +112,7 @@ net.to(device)
 
 ## 5. create training pipeline
 tensor_x = torch.tensor(df['embedding'].tolist())
-tensor_y = torch.tensor(df['Class Index'].tolist(), dtype=torch.long)
+tensor_y = torch.tensor(df['label'].tolist(), dtype=torch.long)
 
 data_train = TensorDataset(tensor_x, tensor_y) # create your datset
 loader_train = DataLoader(data_train, batch_size=batch_size, shuffle=shuffle) # create your dataloader
@@ -140,6 +152,13 @@ for run in range(epoch):
         model_save_path_full = os.path.join(model_save_path, model_name_temp)
         torch.save(net.state_dict(), model_save_path_full)
 
+# save model checkpoint for re-training purposes
+state = {'state_dict': net.state_dict()}
+model_name_temp = model_name + '_checkpoint.pth'
+model_checkpt_path_full = os.path.join(model_save_path, 'checkpoint', model_name_temp)
+torch.save(state, model_checkpt_path_full)
+
+# save full model
 model_name_temp = model_name + '.pth'
 model_save_path_full = os.path.join(model_save_path, model_name_temp)
 torch.save(net.state_dict(), model_save_path_full)

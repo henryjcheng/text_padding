@@ -6,14 +6,24 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class multilayer_perceptron(nn.Module):
-    def __init__(self):
+    def __init__(self, dataset):
+        if dataset == 'ag_news':
+            self.fc1_in = 245 * 50 * 1   
+            self.fc1_out = 120           # same as fc2_in
+            self.fc2_out = 50            # same as fc3_in
+            self.fc3_out = 4             # same as number of classes
+        elif dataset == 'yelp_review_polarity':
+            print('space holder')
+        else:
+            raise ValueError(f'Dataset: {dataset} not recognized.')
+
         super(multilayer_perceptron, self).__init__()
-        self.fc1 = nn.Linear(245 * 50 * 1, 120) # 120 chosen randomly (< 245*50*1)
-        self.fc2 = nn.Linear(120, 50)           # 50 chosen randomly (< 50)
-        self.fc3 = nn.Linear(50, 4)             # 4 = number of classes
+        self.fc1 = nn.Linear(self.fc1_in, self.fc1_out)   
+        self.fc2 = nn.Linear(self.fc1_out, self.fc2_out)         
+        self.fc3 = nn.Linear(self.fc2_out, self.fc3_out)           
     
     def forward(self, x):
-        x = x.view(-1, 245 * 50 * 1)   # token length, w2v embedding dimension, channel
+        x = x.view(-1, self.fc1_in)   # token length, w2v embedding dimension, channel
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)

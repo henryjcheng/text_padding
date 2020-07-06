@@ -26,6 +26,7 @@ data_path = config['PATH']['test_data_path']
 w2v_path = config['PATH']['w2v_path']
 model_save_path = config['PATH']['model_save_path']
 model_name = config['PATH']['model_name']
+dataset = config['PATH']['dataset']
 
 ## MODEL_PARAMETERS
 model_type = config['MODEL_PARAMETERS']['model_type']
@@ -66,7 +67,7 @@ dataiter = iter(loader_test)
 text, labels = dataiter.next()
 
 # load model
-net = model_loader(model_type)
+net = model_loader(model_type, dataset)
 model_name_temp = model_name + '.pth'
 model_save_path_full = os.path.join(model_save_path, model_name_temp)
 
