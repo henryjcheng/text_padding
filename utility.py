@@ -108,18 +108,18 @@ def evaluate_accuracy(loader_test, net, classes, model_type):
         print('Accuracy of class %5s : %2d %%' % (
             classes[i], 100 * class_correct[i] / (class_total[i] + .000001)))
 
-def model_loader(model_type):
+def model_loader(model_type, dataset):
     """
     This function loads model from net.py
     """
     if model_type == 'MP':
-        net = nets.multilayer_perceptron()
+        net = nets.multilayer_perceptron(dataset)
     elif model_type == 'CNN':
-        net = nets.CNN()
+        net = nets.CNN(dataset)
     elif model_type == 'CNN_kim':
-        net = nets.CNN_kim()
+        net = nets.CNN_kim(dataset)
     elif model_type == 'CNN_deep':
-        net = nets.CNN_deep()
+        net = nets.CNN_deep(dataset)
     else:
         raise ValueError(f'\nmodel_type: {model_type} is not recognized.')
 
