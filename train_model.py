@@ -49,14 +49,20 @@ if sample:
 else:
     nrows = None
 
+## load data in chunk
 if dataset == 'ag_news':
-    df = pd.read_csv(data_path, nrows=nrows)
+    tfr = pd.read_csv(data_path, chunksize=120000)
+elif dataset == 'yelp_review_polarity':
+    tfr = pd.read_csv(data_path, names=['label', 'text'], chunksize=100000)
+else:
+    print(f'Dataset: {dataset} is not recognized.')
+
+
+if dataset == 'ag_news':
     df['Class Index'] = df['Class Index'].replace(4, 0)
     df = df.rename(columns={'Class Index':'label'})
     df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
 elif dataset == 'yelp_review_polarity':
-    nrows=50000    # so it fits into 32Gb RAM
-    df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 else:
