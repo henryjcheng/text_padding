@@ -48,7 +48,7 @@ else:
 if dataset == 'ag_news':
     tfr = pd.read_csv(data_path, chunksize=60000)
 elif dataset == 'yelp_review_polarity':
-    tfr = pd.read_csv(data_path, names=['label', 'text'], chunksize=100000)
+    tfr = pd.read_csv(data_path, names=['label', 'text'], chunksize=50000)
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
