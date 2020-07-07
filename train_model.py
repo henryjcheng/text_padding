@@ -46,22 +46,22 @@ else:
 
 ## load data in chunk
 if dataset == 'ag_news':
-    tfr = pd.read_csv(data_path, chunksize=120000)
+    tfr = pd.read_csv(data_path, chunksize=60000)
 elif dataset == 'yelp_review_polarity':
     tfr = pd.read_csv(data_path, names=['label', 'text'], chunksize=100000)
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
 for chunk_count, chunk in enumerate(tfr):
-    print(f'Processing chuck {chunk_count + 1}...')
+    print(f'\nProcessing chunk {chunk_count + 1}...')
 
     if dataset == 'ag_news':
-        df = pd.Dataframe(chunk)
+        df = pd.DataFrame(chunk)
         df['Class Index'] = df['Class Index'].replace(4, 0)
         df = df.rename(columns={'Class Index':'label'})
         df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
     elif dataset == 'yelp_review_polarity':
-        df = pd.Dataframe(chunk)
+        df = pd.DataFrame(chunk)
         df['label'] = df['label'].replace(2, 0)
         df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
     else:
@@ -106,7 +106,7 @@ for chunk_count, chunk in enumerate(tfr):
     # check if checkpoint exists, if not keep going 
     # else load the checkpoint state
     checkpoint_model_name = model_name + '_checkpoint.pth'
-    checkpoint_path = os.path.join(model_save_path, checkpoint_model_name)
+    checkpoint_path = os.path.join(model_save_path, 'checkpoint', checkpoint_model_name)
     if os.path.exists(checkpoint_path):
         checkpoint = torch.load(checkpoint_path)
         net.load_state_dict(checkpoint['state_dict'])
