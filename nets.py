@@ -13,7 +13,10 @@ class multilayer_perceptron(nn.Module):
             self.fc2_out = 50            # same as fc3_in
             self.fc3_out = 4             # same as number of classes
         elif dataset == 'yelp_review_polarity':
-            print('space holder')
+            self.fc1_in = 1200 * 50 * 1   
+            self.fc1_out = 120           # same as fc2_in
+            self.fc2_out = 50            # same as fc3_in
+            self.fc3_out = 2             # same as number of classes            
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
 
