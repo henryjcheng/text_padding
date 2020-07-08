@@ -59,6 +59,7 @@ if dataset == 'ag_news':
     max_length = 245
 elif dataset == 'yelp_review_polarity':
     max_length = 1200
+    df = df[df['text_length'] <= max_length].reset_index(drop=True)     # remove rows with text length > max in train set
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
