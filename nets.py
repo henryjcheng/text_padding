@@ -33,17 +33,24 @@ class multilayer_perceptron(nn.Module):
         return x
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, dataset):
+        if dataset == 'ag_news':
+            self.fc1_in = 239 * 1
+            self.n_class = 4
+        elif dataset == 'yelp_review_polarity':
+            self.fc1_in = 1194 * 1
+            self.n_class = 2
+
         super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 1, (4, 50))        # input channel, output channel, kernel size
         self.pool = nn.MaxPool2d(kernel_size=(4, 1), stride=(1, 1))
-        self.fc1 = nn.Linear(239 * 1, 120)      # 120 chosen randomly (< input dimension)
+        self.fc1 = nn.Linear(self.fc1_in, 120)      # 120 chosen randomly (< input dimension)
         self.fc2 = nn.Linear(120, 50)           # 50 chosen randomly (< 50)
-        self.fc3 = nn.Linear(50, 4)             # 4 = number of classes
+        self.fc3 = nn.Linear(50, self.n_class)             # 4 = number of classes
     
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
-        x = x.view(-1, 239 * 1)   
+        x = x.view(-1, self.fc1_in)   
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
