@@ -33,17 +33,22 @@ model_type = config['MODEL_PARAMETERS']['model_type']
 emb_dim = int(config['MODEL_PARAMETERS']['emb_dim'])
 pad_method = config['MODEL_PARAMETERS']['pad_method']
 
-classes = ('0', '1', '2', '3')
 ## 1. load dataset
 if dataset == 'ag_news':
     df = pd.read_csv(data_path)
     df['label'] = df['Class Index'].replace(4, 0)
     df = df.rename(columns={'Class Index':'label'})
     df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
+
+    classes = ('0', '1', '2', '3')
+
 elif dataset == 'yelp_review_polarity':
     df = pd.read_csv(data_path, names=['label', 'text'])
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+
+    classes = ('0', '1')
+
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
