@@ -3,6 +3,7 @@ This module contains code to train model.
 The module takes input from model.cfg file.
 """
 import os
+import gc
 import time
 import random
 import pandas as pd
@@ -48,7 +49,7 @@ else:
 if dataset == 'ag_news':
     tfr = pd.read_csv(data_path, chunksize=60000)
 elif dataset == 'yelp_review_polarity':
-    tfr = pd.read_csv(data_path, names=['label', 'text'], chunksize=50000)
+    tfr = pd.read_csv(data_path, names=['label', 'text'], chunksize=30000)
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -57,7 +58,7 @@ for chunk_count, chunk in enumerate(tfr):
 
     if dataset == 'ag_news':
         df = pd.DataFrame(chunk)
-        df['Class Index'] = df['Class Index'].replace(4, 0)
+        df['label'] = df['Class Index'].replace(4, 0)
         df = df.rename(columns={'Class Index':'label'})
         df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
     elif dataset == 'yelp_review_polarity':
@@ -88,7 +89,7 @@ for chunk_count, chunk in enumerate(tfr):
     if dataset == 'ag_news':
         max_length = 245
     elif dataset == 'yelp_review_polarity':
-        max_length = 1500
+        max_length = 1200
     else:
         print(f'Dataset: {dataset} is not recognized.')
 
@@ -120,14 +121,20 @@ for chunk_count, chunk in enumerate(tfr):
     net.to(device)
 
     ## 5. create training pipeline
+    print('Load data to DataLoader...')
     tensor_x = torch.tensor(df['embedding'].tolist())
     tensor_y = torch.tensor(df['label'].tolist(), dtype=torch.long)
 
     data_train = TensorDataset(tensor_x, tensor_y) # create your datset
     loader_train = DataLoader(data_train, batch_size=batch_size, shuffle=shuffle) # create your dataloader
 
+    # free up memory occupied by df since already loaded into dataloader
+    del df
+    gc.collect()
+
     ## 6. train and save model
     save_every_epoch = False
+    print('Stat training...')
     for run in range(epoch):
         running_loss = 0.0
         print(f'\nepoch {run + 1}')
@@ -171,5 +178,7 @@ for chunk_count, chunk in enumerate(tfr):
     model_name_temp = model_name + '.pth'
     model_save_path_full = os.path.join(model_save_path, model_name_temp)
     torch.save(net.state_dict(), model_save_path_full)
+
+    gc.collect()
 
 print('\nProcess complete.')
