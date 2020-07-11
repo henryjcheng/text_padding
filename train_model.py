@@ -98,27 +98,30 @@ for chunk_count, chunk in enumerate(tfr):
     df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
     ## 4. load nn architecture
-    net = model_loader(model_type, dataset)
+    if chunk_count == 0:
+        net = model_loader(model_type, dataset)
 
-    # define loss function and optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+        # define loss function and optimizer
+        criterion = nn.CrossEntropyLoss()
+        optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
     # check if checkpoint exists, if not keep going 
     # else load the checkpoint state
-    checkpoint_model_name = model_name + '_checkpoint.pth'
-    checkpoint_path = os.path.join(model_save_path, 'checkpoint', checkpoint_model_name)
-    if os.path.exists(checkpoint_path):
-        checkpoint = torch.load(checkpoint_path)
-        net.load_state_dict(checkpoint['state_dict'])
-    else:
-        print('No checkpoint found. Training new model...')
+    if False:
+        checkpoint_model_name = model_name + '_checkpoint.pth'
+        checkpoint_path = os.path.join(model_save_path, 'checkpoint', checkpoint_model_name)
+        if os.path.exists(checkpoint_path):
+            checkpoint = torch.load(checkpoint_path)
+            net.load_state_dict(checkpoint['state_dict'])
+        else:
+            print('No checkpoint found. Training new model...')
 
-    # train on GPU
-    device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
-    print(f'\ndevice: {device}')
+    if chunk_count == 0:
+        # train on GPU
+        device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
+        print(f'\ndevice: {device}')
 
-    net.to(device)
+        net.to(device)
 
     ## 5. create training pipeline
     print('Load data to DataLoader...')
@@ -179,6 +182,7 @@ for chunk_count, chunk in enumerate(tfr):
     model_save_path_full = os.path.join(model_save_path, model_name_temp)
     torch.save(net.state_dict(), model_save_path_full)
 
+    # remove net to free up space for next iteration of training, which loads a copy of the model
     gc.collect()
 
 print('\nProcess complete.')
