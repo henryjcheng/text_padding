@@ -59,6 +59,11 @@ elif dataset == 'yelp_review_polarity':
     df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+elif dataset == 'yelp_review_full':
+    nrows=50000    # so it fits into 32Gb RAM
+    df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
+    df['label'] = df['label'].replace(5, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -74,6 +79,8 @@ if dataset == 'ag_news':
     df = df
 elif dataset == 'yelp_review_polarity':
     df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
+elif dataset == 'yelp_review_full':
+    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -84,6 +91,8 @@ if dataset == 'ag_news':
     max_length = 245
 elif dataset == 'yelp_review_polarity':
     max_length = 1500
+elif dataset == 'yelp_review_polarity':
+    max_length = 1151
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
