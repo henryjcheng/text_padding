@@ -91,7 +91,7 @@ if dataset == 'ag_news':
     max_length = 245
 elif dataset == 'yelp_review_polarity':
     max_length = 1500
-elif dataset == 'yelp_review_polarity':
+elif dataset == 'yelp_review_full':
     max_length = 1151
 else:
     print(f'Dataset: {dataset} is not recognized.')
