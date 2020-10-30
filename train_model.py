@@ -90,9 +90,9 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 if dataset == 'ag_news':
     max_length = 245
 elif dataset == 'yelp_review_polarity':
-    max_length = 1500
+    max_length = 1200
 elif dataset == 'yelp_review_full':
-    max_length = 1151
+    max_length = 1200   # max is 1151, use 1200
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
