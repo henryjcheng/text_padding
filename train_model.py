@@ -41,7 +41,6 @@ epoch = int(config['MODEL_PARAMETERS']['epoch'])
 ## CONTINUOUS TRAINING PARAMETERS
 continuous_train = config['CONTINUOUS_TRAINING'].getboolean('continuous_train')
 model_checkpoint_path = config['CONTINUOUS_TRAINING']['model_checkpoint_path']
-epochs_left = int(config['CONTINUOUS_TRAINING']['epochs_left'])
 
 ## 1. load dataset
 if sample:
@@ -60,8 +59,7 @@ elif dataset == 'yelp_review_polarity':
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 elif dataset == 'yelp_review_full':
-    nrows=50000    # so it fits into 32Gb RAM
-    df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
+    df = pd.read_csv(data_path, names=['label', 'text'])
     df['label'] = df['label'].replace(5, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 else:
@@ -111,7 +109,6 @@ if continuous_train:
     print('\nTraining from checkpoint.')
     checkpoint = torch.load(model_checkpoint_path)
     net.load_state_dict(checkpoint['state_dict'])
-    epoch = epochs_left
 
 # train on GPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
