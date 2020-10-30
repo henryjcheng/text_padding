@@ -39,6 +39,18 @@ class multilayer_perceptron(nn.Module):
 
 class CNN(nn.Module):
     def __init__(self):
+        if dataset == 'ag_news':
+            self.fc1_in = 239 * 1
+            self.n_class = 4
+        elif dataset == 'yelp_review_polarity':
+            self.fc1_in = 1194 * 1
+            self.n_class = 2
+        elif dataset == 'yelp_review_full':
+            self.fc1_in = 1194 * 1
+            self.n_class = 5
+        else:
+            raise ValueError(f'Dataset: {dataset} not recognized.')
+
         super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 1, (4, 50))        # input channel, output channel, kernel size
         self.pool = nn.MaxPool2d(kernel_size=(4, 1), stride=(1, 1))
@@ -56,6 +68,18 @@ class CNN(nn.Module):
 
 class CNN_kim(nn.Module):
     def __init__(self):
+        if dataset == 'ag_news':
+            self.fc1_in = 240
+            self.n_class = 4
+        elif dataset == 'yelp_review_polarity':
+            self.fc1_in = 1195
+            self.n_class = 2
+        elif dataset == 'yelp_review_full':
+            self.fc1_in = 1195
+            self.n_class = 5
+        else:
+            raise ValueError(f'Dataset: {dataset} not recognized.')
+
         super(CNN_kim, self).__init__()
         self.conv1_a = nn.Conv2d(1, 1, (3, 50))    # channel 1 of conv, with kernel=3 
         self.conv1_b = nn.Conv2d(1, 1, (4, 50))    # channel 2 of conv, with kernel=4
@@ -83,6 +107,27 @@ class CNN_kim(nn.Module):
 
 class CNN_deep(nn.Module):
     def __init__(self):
+        if dataset == 'ag_news':
+            self.kernel2 = 120
+            self.kernel3 = 59
+            self.kernel4 = 28
+            self.fc1_in = 27
+            self.n_class = 4
+        elif dataset == 'yelp_review_polarity':
+            self.kernel2 = 598
+            self.kernel3 = 297
+            self.kernel4 = 147
+            self.fc1_in = 147
+            self.n_class = 2
+        elif dataset == 'yelp_review_polarity':
+            self.kernel2 = 598
+            self.kernel3 = 297
+            self.kernel4 = 147
+            self.fc1_in = 147
+            self.n_class = 5
+        else:
+            raise ValueError(f'Dataset: {dataset} not recognized.')
+
         super(CNN_deep, self).__init__()
         self.conv1 = nn.Conv2d(1, 64, (3, 50))
 
