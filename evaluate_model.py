@@ -49,6 +49,13 @@ elif dataset == 'yelp_review_polarity':
 
     classes = ('0', '1')
 
+elif dataset == 'yelp_review_full':
+    df = pd.read_csv(data_path, names=['label', 'text'])
+    df['label'] = df['label'].replace(5, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+
+    classes = ('0', '1', '2', '3', '4')
+
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -63,6 +70,9 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 if dataset == 'ag_news':
     max_length = 245
 elif dataset == 'yelp_review_polarity':
+    max_length = 1200
+    df = df[df['text_length'] <= max_length].reset_index(drop=True)     # remove rows with text length > max in train set
+elif dataset == 'yelp_review_full':
     max_length = 1200
     df = df[df['text_length'] <= max_length].reset_index(drop=True)     # remove rows with text length > max in train set
 else:
