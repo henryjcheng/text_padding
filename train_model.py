@@ -17,6 +17,8 @@ from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding, model_loader, vocab_clean_up
 
+time0 = time.time()
+
 ## 0. setting up parameter
 config = configparser.ConfigParser()
 config.read('model.cfg') 
@@ -59,9 +61,16 @@ elif dataset == 'yelp_review_polarity':
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 elif dataset == 'yelp_review_full':
-    df = pd.read_csv(data_path, names=['label', 'text'])
+    nrows=50000
+    df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
     df['label'] = df['label'].replace(5, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+    print(df.head(3))
+elif dataset == 'dbpedia':
+    df = pd.read_csv(data_path, names=['label', 'title', 'text']).sample(n=50000, random_state=1)
+    df['label'] = df['label'].replace(14, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+    print(df.head(3))
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -99,6 +108,7 @@ print(f'sample is {sample},    training size: {df.shape[0]},    max length: {max
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
 ## 4. load nn architecture
+print(dataset)
 net = model_loader(model_type, dataset)
 
 # define loss function and optimizer
@@ -170,3 +180,4 @@ model_save_path_full = os.path.join(model_save_path, model_name_temp)
 torch.save(net.state_dict(), model_save_path_full)
 
 print('\nProcess complete.')
+print(f'Time Elapsed: {round(time.time() - time0, 2)}')

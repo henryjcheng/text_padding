@@ -3,6 +3,7 @@ This module contains code to evaluate model against test set.
 The module takes input from model.cfg file.
 """
 import os
+import time
 import random
 import pandas as pd
 import configparser
@@ -16,6 +17,8 @@ from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding, evaluate_accuracy, model_loader, vocab_clean_up
 from nets import multilayer_perceptron, CNN, CNN_kim, CNN_deep
+
+time0 = time.time()
 
 ## 0. setting up parameter
 config = configparser.ConfigParser()
@@ -100,3 +103,5 @@ net.load_state_dict(torch.load(model_save_path_full))
 net.eval()
 
 evaluate_accuracy(loader_test, net, classes, model_type)
+
+print(f'\nTime Elapsed: {round(time.time() - time0, 2)}')
