@@ -59,6 +59,13 @@ elif dataset == 'yelp_review_full':
 
     classes = ('0', '1', '2', '3', '4')
 
+elif dataset == 'dbpedia_ontology':
+    df = pd.read_csv(data_path, names=['label', 'title', 'text'])
+    df['label'] = df['label'].replace(14, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+
+    classes = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13')
+
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -77,6 +84,9 @@ elif dataset == 'yelp_review_polarity':
     df = df[df['text_length'] <= max_length].reset_index(drop=True)     # remove rows with text length > max in train set
 elif dataset == 'yelp_review_full':
     max_length = 1200
+    df = df[df['text_length'] <= max_length].reset_index(drop=True)     # remove rows with text length > max in train set
+elif dataset == 'dbpedia_ontology':
+    max_length = 413
     df = df[df['text_length'] <= max_length].reset_index(drop=True)     # remove rows with text length > max in train set
 else:
     print(f'Dataset: {dataset} is not recognized.')

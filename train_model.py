@@ -66,7 +66,7 @@ elif dataset == 'yelp_review_full':
     df['label'] = df['label'].replace(5, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
     print(df.head(3))
-elif dataset == 'dbpedia':
+elif dataset == 'dbpedia_ontology':
     df = pd.read_csv(data_path, names=['label', 'title', 'text']).sample(n=50000, random_state=1)
     df['label'] = df['label'].replace(14, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
@@ -88,6 +88,8 @@ elif dataset == 'yelp_review_polarity':
     df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 elif dataset == 'yelp_review_full':
     df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
+elif dataset == 'dbpedia_ontology':
+    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -100,6 +102,8 @@ elif dataset == 'yelp_review_polarity':
     max_length = 1200
 elif dataset == 'yelp_review_full':
     max_length = 1200   # max is 1151, use 1200
+elif dataset == 'dbpedia_ontology':
+    max_length = 413
 else:
     print(f'Dataset: {dataset} is not recognized.')
 

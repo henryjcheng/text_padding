@@ -22,6 +22,11 @@ class multilayer_perceptron(nn.Module):
             self.fc1_out = 120           # same as fc2_in
             self.fc2_out = 50            # same as fc3_in
             self.fc3_out = 5             # same as number of classes
+        elif dataset == 'dbpedia_ontology':
+            self.fc1_in = 413 * 50 * 1   
+            self.fc1_out = 120           # same as fc2_in
+            self.fc2_out = 50            # same as fc3_in
+            self.fc3_out = 14            # same as number of classes
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
 
@@ -48,6 +53,9 @@ class CNN(nn.Module):
         elif dataset == 'yelp_review_full':
             self.fc1_in = 1194 * 1
             self.n_class = 5
+        elif dataset == 'dbpedia_ontology':
+            self.fc1_in = 407 * 1
+            self.n_class = 14
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
 
@@ -77,6 +85,9 @@ class CNN_kim(nn.Module):
         elif dataset == 'yelp_review_full':
             self.fc1_in = 1195
             self.n_class = 5
+        elif dataset == 'dbpedia_ontology':
+            self.fc1_in = 408
+            self.n_class = 14
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
 
@@ -125,6 +136,12 @@ class CNN_deep(nn.Module):
             self.kernel4 = 147
             self.fc1_in = 147
             self.n_class = 5
+        elif dataset == 'dbpedia_ontology':
+            self.kernel2 = 205
+            self.kernel3 = 101
+            self.kernel4 = 49
+            self.fc1_in = 47
+            self.n_class = 14
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
 
