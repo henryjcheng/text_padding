@@ -104,7 +104,7 @@ def evaluate_accuracy(loader_test, net, classes, model_type):
                 class_correct[label] += c[i].item()
                 class_total[label] += 1
 
-    for i in range(4):
+    for i in range(len(classes)):
         print('Accuracy of class %5s : %2d %%' % (
             classes[i], 100 * class_correct[i] / (class_total[i] + .000001)))
 

@@ -17,6 +17,8 @@ from torch.utils.data import TensorDataset, DataLoader
 
 from utility import zero_padding, model_loader, vocab_clean_up
 
+time0 = time.time()
+
 ## 0. setting up parameter
 config = configparser.ConfigParser()
 config.read('model.cfg') 
@@ -41,7 +43,6 @@ epoch = int(config['MODEL_PARAMETERS']['epoch'])
 ## CONTINUOUS TRAINING PARAMETERS
 continuous_train = config['CONTINUOUS_TRAINING'].getboolean('continuous_train')
 model_checkpoint_path = config['CONTINUOUS_TRAINING']['model_checkpoint_path']
-epochs_left = int(config['CONTINUOUS_TRAINING']['epochs_left'])
 
 ## 1. load dataset
 if sample:
@@ -59,6 +60,17 @@ elif dataset == 'yelp_review_polarity':
     df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+elif dataset == 'yelp_review_full':
+    nrows=50000
+    df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
+    df['label'] = df['label'].replace(5, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+    print(df.head(3))
+elif dataset == 'dbpedia_ontology':
+    df = pd.read_csv(data_path, names=['label', 'title', 'text']).sample(n=50000, random_state=1)
+    df['label'] = df['label'].replace(14, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+    print(df.head(3))
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -74,6 +86,10 @@ if dataset == 'ag_news':
     df = df
 elif dataset == 'yelp_review_polarity':
     df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
+elif dataset == 'yelp_review_full':
+    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
+elif dataset == 'dbpedia_ontology':
+    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -83,7 +99,11 @@ df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 if dataset == 'ag_news':
     max_length = 245
 elif dataset == 'yelp_review_polarity':
-    max_length = 1500
+    max_length = 1200
+elif dataset == 'yelp_review_full':
+    max_length = 1200   # max is 1151, use 1200
+elif dataset == 'dbpedia_ontology':
+    max_length = 413
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -92,6 +112,7 @@ print(f'sample is {sample},    training size: {df.shape[0]},    max length: {max
 df['embedding'] = df['embedding'].apply(lambda x: zero_padding(x, max_length, emb_dim, pad_method))
 
 ## 4. load nn architecture
+print(dataset)
 net = model_loader(model_type, dataset)
 
 # define loss function and optimizer
@@ -102,7 +123,6 @@ if continuous_train:
     print('\nTraining from checkpoint.')
     checkpoint = torch.load(model_checkpoint_path)
     net.load_state_dict(checkpoint['state_dict'])
-    epoch = epochs_left
 
 # train on GPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
@@ -164,3 +184,4 @@ model_save_path_full = os.path.join(model_save_path, model_name_temp)
 torch.save(net.state_dict(), model_save_path_full)
 
 print('\nProcess complete.')
+print(f'Time Elapsed: {round(time.time() - time0, 2)}')

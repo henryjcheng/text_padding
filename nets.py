@@ -13,7 +13,20 @@ class multilayer_perceptron(nn.Module):
             self.fc2_out = 50            # same as fc3_in
             self.fc3_out = 4             # same as number of classes
         elif dataset == 'yelp_review_polarity':
-            print('space holder')
+            self.fc1_in = 1200 * 50 * 1   
+            self.fc1_out = 120           # same as fc2_in
+            self.fc2_out = 50            # same as fc3_in
+            self.fc3_out = 2             # same as number of classes
+        elif dataset == 'yelp_review_full':
+            self.fc1_in = 1200 * 50 * 1   
+            self.fc1_out = 120           # same as fc2_in
+            self.fc2_out = 50            # same as fc3_in
+            self.fc3_out = 5             # same as number of classes
+        elif dataset == 'dbpedia_ontology':
+            self.fc1_in = 413 * 50 * 1   
+            self.fc1_out = 120           # same as fc2_in
+            self.fc2_out = 50            # same as fc3_in
+            self.fc3_out = 14            # same as number of classes
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
 
@@ -30,24 +43,54 @@ class multilayer_perceptron(nn.Module):
         return x
 
 class CNN(nn.Module):
-    def __init__(self):
+    def __init__(self, dataset):
+        if dataset == 'ag_news':
+            self.fc1_in = 239 * 1
+            self.n_class = 4
+        elif dataset == 'yelp_review_polarity':
+            self.fc1_in = 1194 * 1
+            self.n_class = 2
+        elif dataset == 'yelp_review_full':
+            self.fc1_in = 1194 * 1
+            self.n_class = 5
+        elif dataset == 'dbpedia_ontology':
+            self.fc1_in = 407 * 1
+            self.n_class = 14
+        else:
+            raise ValueError(f'Dataset: {dataset} not recognized.')
+
         super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 1, (4, 50))        # input channel, output channel, kernel size
         self.pool = nn.MaxPool2d(kernel_size=(4, 1), stride=(1, 1))
-        self.fc1 = nn.Linear(239 * 1, 120)      # 120 chosen randomly (< input dimension)
+        self.fc1 = nn.Linear(self.fc1_in, 120)      # 120 chosen randomly (< input dimension)
         self.fc2 = nn.Linear(120, 50)           # 50 chosen randomly (< 50)
-        self.fc3 = nn.Linear(50, 4)             # 4 = number of classes
+        self.fc3 = nn.Linear(50, self.n_class)             # 4 = number of classes
     
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
-        x = x.view(-1, 239 * 1)   
+        x = x.view(-1, self.fc1_in)   
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
 
 class CNN_kim(nn.Module):
-    def __init__(self):
+    def __init__(self, dataset):
+        if dataset == 'ag_news':
+            self.fc1_in = 240
+            self.n_class = 4
+        elif dataset == 'yelp_review_polarity':
+            self.fc1_in = 1195
+            self.n_class = 2
+        elif dataset == 'yelp_review_full':
+            self.fc1_in = 1195
+            self.n_class = 5
+        elif dataset == 'dbpedia_ontology':
+            self.fc1_in = 408
+            self.n_class = 14
+        else:
+            raise ValueError(f'Dataset: {dataset} not recognized.')
+
         super(CNN_kim, self).__init__()
         self.conv1_a = nn.Conv2d(1, 1, (3, 50))    # channel 1 of conv, with kernel=3 
         self.conv1_b = nn.Conv2d(1, 1, (4, 50))    # channel 2 of conv, with kernel=4
@@ -55,18 +98,18 @@ class CNN_kim(nn.Module):
         self.pool = nn.MaxPool2d(kernel_size=(4, 1), stride=(1, 1))
         self.pool_b = nn.MaxPool2d(kernel_size=(3, 1), stride=(1, 1))
         self.pool_c = nn.MaxPool2d(kernel_size=(2, 1), stride=(1, 1))
-        self.fc1 = nn.Linear(240 * 3, 120)
+        self.fc1 = nn.Linear(self.fc1_in * 3, 120)
         self.fc2 = nn.Linear(120, 50)
-        self.fc3 = nn.Linear(50, 4)
+        self.fc3 = nn.Linear(50, self.n_class)
     
     def forward(self, x):
         x0 = x
         x = self.pool(F.relu(self.conv1_a(x)))
         y = self.pool_b(F.relu(self.conv1_b(x0)))
         z = self.pool_c(F.relu(self.conv1_c(x0)))
-        x = x.view(-1, 240 * 1)
-        y = y.view(-1, 240 * 1)
-        z = z.view(-1, 240 * 1)
+        x = x.view(-1, self.fc1_in * 1)
+        y = y.view(-1, self.fc1_in * 1)
+        z = z.view(-1, self.fc1_in * 1)
         x = torch.cat((x, y, z), dim=1)    # combine results from three conv
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
@@ -74,28 +117,55 @@ class CNN_kim(nn.Module):
         return x
 
 class CNN_deep(nn.Module):
-    def __init__(self):
+    def __init__(self, dataset):
+        if dataset == 'ag_news':
+            self.kernel2 = 120
+            self.kernel3 = 59
+            self.kernel4 = 28
+            self.fc1_in = 27
+            self.n_class = 4
+        elif dataset == 'yelp_review_polarity':
+            self.kernel2 = 598
+            self.kernel3 = 297
+            self.kernel4 = 147
+            self.fc1_in = 147
+            self.n_class = 2
+        elif dataset == 'yelp_review_full':
+            self.kernel2 = 598
+            self.kernel3 = 297
+            self.kernel4 = 147
+            self.fc1_in = 147
+            self.n_class = 5
+        elif dataset == 'dbpedia_ontology':
+            self.kernel2 = 205
+            self.kernel3 = 101
+            self.kernel4 = 49
+            self.fc1_in = 47
+            self.n_class = 14
+        else:
+            raise ValueError(f'Dataset: {dataset} not recognized.')
+
         super(CNN_deep, self).__init__()
         self.conv1 = nn.Conv2d(1, 64, (3, 50))
 
         # Conv block 1
         self.conv2 = nn.Conv2d(64, 64, (3, 1))
         self.conv2_bn = nn.BatchNorm2d(64)
-        self.pool2 = nn.MaxPool2d(kernel_size=(120, 1), stride=(1, 1))  # halve the dimension
+        self.pool2 = nn.MaxPool2d(kernel_size=(self.kernel2, 1), stride=(1, 1))  # halve the dimension
 
         # Conv block 2
         self.conv3 = nn.Conv2d(128, 128, (3, 1))
         self.conv3_bn = nn.BatchNorm2d(128)
-        self.pool3 = nn.MaxPool2d(kernel_size=(59, 1), stride=(1, 1))    # halve the dimension
+        self.pool3 = nn.MaxPool2d(kernel_size=(self.kernel3, 1), stride=(1, 1))    # halve the dimension
 
         # Conv block 3
         self.conv4 = nn.Conv2d(256, 256, (3, 1))
         self.conv4_bn = nn.BatchNorm2d(256)
-        self.pool4 = nn.MaxPool2d(kernel_size=(28, 1), stride=(1, 1))   # halve the dimension
+        self.pool4 = nn.MaxPool2d(kernel_size=(self.kernel4, 1), stride=(1, 1))   # halve the dimension
 
-        self.fc1 = nn.Linear(27 * 1 * 512, 4096)
+        self.fc1 = nn.Linear(self.fc1_in * 1 * 512, 4096)
         self.fc2 = nn.Linear(4096, 2048)
-        self.fc3 = nn.Linear(2048, 4)
+        self.fc3 = nn.Linear(2048, self.n_class)
     
     def forward(self, x):
         x = self.conv1(x)
@@ -118,7 +188,7 @@ class CNN_deep(nn.Module):
         x = self.pool4(x)
         x = torch.cat((x, x), dim=1)        # doubling the feature space
 
-        x = x.view(-1, 27 * 1 * 512)
+        x = x.view(-1, self.fc1_in * 1 * 512)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
