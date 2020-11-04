@@ -88,6 +88,9 @@ if __name__ == "__main__":
     elif dataset == 'dbpedia_ontology':
         df = pd.read_csv(data_path, header=0, names=['label', 'title', 'text'])
         df_text = df[['text']].reset_index(drop=True)
+    elif dataset == 'amazon_review_polarity':
+        df = pd.read_csv(data_path, header=0, names=['label', 'title', 'text'])
+        df_text = df[['text']].reset_index(drop=True)
     else:
         print(f'Dataset: {dataset} not recognized.')
     
