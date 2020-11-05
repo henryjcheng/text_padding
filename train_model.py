@@ -86,16 +86,8 @@ df = df[df['text_length'] > 0].reset_index(drop=True)
 # reduce footprint
 if dataset == 'ag_news':
     df = df
-elif dataset == 'yelp_review_polarity':
-    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
-elif dataset == 'yelp_review_full':
-    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
-elif dataset == 'dbpedia_ontology':
-    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
-elif dataset == 'amazon_review_polarity':
-    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 else:
-    print(f'Dataset: {dataset} is not recognized.')
+    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 
 df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
