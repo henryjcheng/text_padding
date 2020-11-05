@@ -65,12 +65,14 @@ elif dataset == 'yelp_review_full':
     df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
     df['label'] = df['label'].replace(5, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
-    print(df.head(3))
 elif dataset == 'dbpedia_ontology':
     df = pd.read_csv(data_path, names=['label', 'title', 'text']).sample(n=50000, random_state=1)
     df['label'] = df['label'].replace(14, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
-    print(df.head(3))
+elif dataset == 'amazon_review_polarity':
+    df = pd.read_csv(data_path, names=['label', 'title', 'text']).sample(n=50000, random_state=1)
+    df['label'] = df['label'].replace(2, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -84,14 +86,8 @@ df = df[df['text_length'] > 0].reset_index(drop=True)
 # reduce footprint
 if dataset == 'ag_news':
     df = df
-elif dataset == 'yelp_review_polarity':
-    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
-elif dataset == 'yelp_review_full':
-    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
-elif dataset == 'dbpedia_ontology':
-    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 else:
-    print(f'Dataset: {dataset} is not recognized.')
+    df = df[['label', 'text_token', 'text_length']].reset_index(drop=True)
 
 df['embedding'] = df['text_token'].apply(lambda x: w2v[x])
 
@@ -104,6 +100,8 @@ elif dataset == 'yelp_review_full':
     max_length = 1200   # max is 1151, use 1200
 elif dataset == 'dbpedia_ontology':
     max_length = 413
+elif dataset == 'amazon_review_polarity':
+    max_length = 657
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
