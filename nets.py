@@ -153,10 +153,10 @@ class CNN_deep(nn.Module):
             self.kernel4 = 49
             self.fc1_in = 47
             self.n_class = 14
-        elif dataset == 'yelp_review_polarity':
+        elif dataset == 'amazon_review_polarity':
             self.kernel2 = 327
-            self.kernel3 = 163
-            self.kernel4 = 81
+            self.kernel3 = 162
+            self.kernel4 = 78
             self.fc1_in = 79
             self.n_class = 2
         else:
