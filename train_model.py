@@ -73,6 +73,10 @@ elif dataset == 'amazon_review_polarity':
     df = pd.read_csv(data_path, names=['label', 'title', 'text']).sample(n=50000, random_state=1)
     df['label'] = df['label'].replace(2, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
+elif dataset == 'amazon_review_full':
+    df = pd.read_csv(data_path, names=['label', 'title', 'text']).sample(n=50000, random_state=1)
+    df['label'] = df['label'].replace(5, 0)
+    df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
@@ -102,6 +106,8 @@ elif dataset == 'dbpedia_ontology':
     max_length = 413
 elif dataset == 'amazon_review_polarity':
     max_length = 657
+elif dataset == 'amazon_review_full':
+    max_length = 491
 else:
     print(f'Dataset: {dataset} is not recognized.')
 
