@@ -107,7 +107,7 @@ elif dataset == 'dbpedia_ontology':
 elif dataset == 'amazon_review_polarity':
     max_length = 657
 elif dataset == 'amazon_review_full':
-    max_length = 491
+    max_length = 586    # from error message of receiving 586
 else:
     print(f'Dataset: {dataset} is not recognized.')
 

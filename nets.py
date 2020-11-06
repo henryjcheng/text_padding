@@ -33,7 +33,7 @@ class multilayer_perceptron(nn.Module):
             self.fc2_out = 50            # same as fc3_in
             self.fc3_out = 2             # same as number of classes
         elif dataset == 'amazon_review_full':
-            self.fc1_in = 491 * 50 * 1   
+            self.fc1_in = 586 * 50 * 1   
             self.fc1_out = 120           # same as fc2_in
             self.fc2_out = 50            # same as fc3_in
             self.fc3_out = 5             # same as number of classes
@@ -70,7 +70,7 @@ class CNN(nn.Module):
             self.fc1_in = 651 * 1
             self.n_class = 2
         elif dataset == 'amazon_review_full':
-            self.fc1_in = 485 * 1
+            self.fc1_in = 580 * 1
             self.n_class = 5
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
@@ -108,7 +108,7 @@ class CNN_kim(nn.Module):
             self.fc1_in = 652
             self.n_class = 2
         elif dataset == 'amazon_review_full':
-            self.fc1_in = 486
+            self.fc1_in = 581
             self.n_class = 5
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
@@ -171,10 +171,10 @@ class CNN_deep(nn.Module):
             self.fc1_in = 79
             self.n_class = 2
         elif dataset == 'amazon_review_full':
-            self.kernel2 = 244
-            self.kernel3 = 120
-            self.kernel4 = 59
-            self.fc1_in = 57
+            self.kernel2 = 291
+            self.kernel3 = 144
+            self.kernel4 = 71
+            self.fc1_in = 69
             self.n_class = 5
         else:
             raise ValueError(f'Dataset: {dataset} not recognized.')
