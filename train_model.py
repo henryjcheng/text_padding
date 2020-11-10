@@ -62,7 +62,8 @@ elif dataset == 'yelp_review_polarity':
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 elif dataset == 'yelp_review_full':
     nrows=50000
-    df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
+    #df = pd.read_csv(data_path, nrows=nrows, names=['label', 'text'])
+    df = pd.read_csv(data_path, nrows=nrows)
     df['label'] = df['label'].replace(5, 0)
     df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 elif dataset == 'dbpedia_ontology':
@@ -127,12 +128,17 @@ if continuous_train:
     print('\nTraining from checkpoint.')
     checkpoint = torch.load(model_checkpoint_path)
     net.load_state_dict(checkpoint['state_dict'])
+    #optimizer.load_state_dict(checkpoint['optimizer'])
 
 # train on GPU
 device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
 print(f'\ndevice: {device}')
 
 net.to(device)
+
+# optimizer will use CPU and throw exception if load before device
+if continuous_train:
+    optimizer.load_state_dict(checkpoint['optimizer']) 
 
 ## 5. create training pipeline
 tensor_x = torch.tensor(df['embedding'].tolist())
@@ -142,7 +148,6 @@ data_train = TensorDataset(tensor_x, tensor_y) # create your datset
 loader_train = DataLoader(data_train, batch_size=batch_size, shuffle=shuffle) # create your dataloader
 
 ## 6. train and save model
-save_every_epoch = False
 for run in range(epoch):
     running_loss = 0.0
     print(f'\nepoch {run + 1}')
@@ -172,12 +177,9 @@ for run in range(epoch):
     time_diff_epoch = round(time.time() - time0_epoch, 2)
     print(f'\tTime elapsed: {time_diff_epoch}')
 
-    if save_every_epoch:
-        model_save_path_full = os.path.join(model_save_path, model_name_temp)
-        torch.save(net.state_dict(), model_save_path_full)
-
 # save model checkpoint for re-training purposes
-state = {'state_dict': net.state_dict()}
+state = {'state_dict': net.state_dict(),
+         'optimizer': optimizer.state_dict()}
 model_name_temp = model_name + '_checkpoint.pth'
 model_checkpt_path_full = os.path.join(model_save_path, 'checkpoint', model_name_temp)
 torch.save(state, model_checkpt_path_full)
