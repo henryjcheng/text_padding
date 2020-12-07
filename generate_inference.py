@@ -48,14 +48,14 @@ for dataset in list_dataset:
         classes = ('0', '1', '2', '3')
 
     elif dataset == 'yelp_review_polarity':
-        df = pd.read_csv(data_path, names=['label', 'text'])
+        df = pd.read_csv(data_path, names=['label', 'text']).sample(n=5000, random_state=1)
         df['label'] = df['label'].replace(2, 0)
         df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 
         classes = ('0', '1')
 
     elif dataset == 'yelp_review_full':
-        df = pd.read_csv(data_path, names=['label', 'text'])
+        df = pd.read_csv(data_path, names=['label', 'text']).sample(n=5000, random_state=1)
         df['label'] = df['label'].replace(5, 0)
         df['text_token'] = df['text'].apply(lambda x: word_tokenize(x))
 
