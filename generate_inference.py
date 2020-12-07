@@ -43,6 +43,8 @@ if dataset == 'ag_news':
     df['label'] = df['Class Index'].replace(4, 0)
     df['text_token'] = df['Description'].apply(lambda x: word_tokenize(x))
 
+    df = df.rename(columns={'Description':'text'})
+
     classes = ('0', '1', '2', '3')
 
 elif dataset == 'yelp_review_polarity':
@@ -134,6 +136,6 @@ net.eval()
 
 list_pred = generate_inference(loader_test, net, classes, model_type)
 
-df_inference = pd.DataFrame(list_pred, columns = ['prediction'])
-print(df_inference.head())
+df_inference = pd.concat([df[['text', 'label']], pd.DataFrame(list_pred, columns = ['prediction'])], axis=1, sort=False)
+
 print(f'\nTime Elapsed: {round(time.time() - time0, 2)}')
