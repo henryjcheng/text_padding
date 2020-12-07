@@ -139,5 +139,31 @@ def vocab_clean_up(token_list, w2v):
 
     return temp_list
 
+def generate_inference(loader_test, net, classes, model_type):
+    """
+    This function takes pytorch data loader, pytorch class for NN, 
+    and a tuple of class labels to calculate accuracy at macro and class levels
+    """
+    correct = 0
+    total = 0
+
+    list_pred = []
+    with torch.no_grad():
+        for data in loader_test:
+            text, labels = data
+            if model_type != 'MP':
+                text = text.unsqueeze(1)    # reshape text to add 1 channel
+
+            outputs = net(text)
+            _, predicted = torch.max(outputs.data, 1)
+
+            for y in predicted:
+                list_pred.append(y)
+
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    return list_pred
+
 if __name__ == "__main__":
     pass
