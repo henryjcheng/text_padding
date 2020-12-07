@@ -163,8 +163,6 @@ def generate_inference(loader_test, net, classes, model_type):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-    print(f'\nAccuracy: {100 * correct/total}%')
-
     return list_pred
 
 if __name__ == "__main__":
